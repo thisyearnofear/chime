@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { Tap } from '@/components/ui/Tap'
+import { Frame } from '@/components/ui/Frame'
 import { useAgentStore } from '@/stores/agentStore'
 import { usePositionStore } from '@/stores/positionStore'
 import { useWallet } from '@/hooks/useWallet'
@@ -44,12 +45,13 @@ export default function DashboardPage() {
   const followed = decision?.seats.find((s) => s.label === allegiance)
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-10">
+    <div className="mx-auto max-w-3xl px-4 py-8 md:py-10">
       <h1 className="font-display text-4xl text-[var(--ink)]">Desk</h1>
-      <p className="mt-2 text-[13px] text-[var(--mute)]">Fills, claim, allegiance.</p>
+      <p className="mt-2 mb-6 text-[13px] text-[var(--mute)]">Fills, claim, allegiance.</p>
 
+      <Frame label="DESK" meta={isConnected ? net.name : 'offline'}>
       {!isConnected && (
-        <div className="mt-8 flex items-center justify-between gap-4 border-t border-[var(--line)] pt-6">
+        <div className="flex items-center justify-between gap-4">
           <p className="text-[13px] text-[var(--mute)]">Connect to see fills and claim winnings.</p>
           <Tap tone="brass" onClick={() => void connect()}>
             Connect
@@ -57,7 +59,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <dl className="mt-10 grid sm:grid-cols-2 gap-x-8 gap-y-4 text-[13px]">
+      <dl className="mt-6 grid sm:grid-cols-2 gap-x-8 gap-y-4 text-[13px]">
         <div>
           <dt className="text-[var(--mute)]">Network</dt>
           <dd>{net.name}{networkMetrics.isOnSomnia ? '' : ' · switch'}</dd>
@@ -106,6 +108,7 @@ export default function DashboardPage() {
           </li>
         ))}
       </ol>
+      </Frame>
     </div>
   )
 }

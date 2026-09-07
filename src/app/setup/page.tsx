@@ -6,6 +6,7 @@ import { useAgentStore } from '@/stores/agentStore'
 import { useWallet } from '@/hooks/useWallet'
 import { useExchange } from '@/hooks/useExchange'
 import { Tap } from '@/components/ui/Tap'
+import { Frame } from '@/components/ui/Frame'
 import { getMarketNetwork } from '@/lib/markets/config'
 import { faucetCollateral, TradeError } from '@/lib/markets/trade'
 import { useAddToast } from '@/components/unified/UnifiedToast'
@@ -64,13 +65,14 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10">
+    <div className="mx-auto max-w-2xl px-4 py-8 md:py-10">
       <h1 className="font-display text-4xl text-[var(--ink)]">Setup</h1>
-      <p className="mt-2 text-[13px] text-[var(--mute)]">
+      <p className="mt-2 mb-6 text-[13px] text-[var(--mute)]">
         Pick who you ride with. Size is set here so the floor stays two taps.
       </p>
 
-      <div className="mt-10 flex flex-col">
+      <Frame label="ALLEGIANCE" meta={`${net.collateralSymbol} · ${net.name}`}>
+      <div className="flex flex-col">
         {PERSONALITY_PRESETS.map((p) => {
           const selected = allegiance === p.label
           return (
@@ -80,7 +82,7 @@ export default function SetupPage() {
               onClick={() => setAllegiance(p.label)}
               aria-pressed={selected}
               className={cn(
-                'text-left py-4 border-t border-[var(--line)] flex items-baseline justify-between gap-4',
+                'text-left py-4 border-t border-[var(--line)] first:border-t-0 flex items-baseline justify-between gap-4',
                 selected ? 'text-[var(--brass)]' : 'text-[var(--ink)]'
               )}
             >
@@ -121,6 +123,7 @@ export default function SetupPage() {
           </Tap>
         )}
       </div>
+      </Frame>
     </div>
   )
 }

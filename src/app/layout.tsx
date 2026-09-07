@@ -48,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ToastProvider>
           <GlobalErrorBoundary enableRecovery={true} showErrorDetails={process.env.NODE_ENV === 'development'}>
             <ShellNav />
-            <main id="main-content" className="relative pt-20 sm:pt-14">
+            <main id="main-content" className="relative pt-14">
               {children}
             </main>
           </GlobalErrorBoundary>

@@ -35,7 +35,7 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
   const r = compact ? 84 : 138
   const circ = 2 * Math.PI * r
   const dash = circ * remain
-  const display = done ? 'CHIME' : formatCountdown(left)
+  const display = !window ? '—' : done ? 'CHIME' : formatCountdown(left)
   const cadence = window ? `${window.asset} ${formatInterval(window.intervalSec)}` : '…'
 
   useEffect(() => {
@@ -53,12 +53,28 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
   return (
     <svg
       viewBox={`0 0 ${size} ${size}`}
-      width={compact ? 'min(56vw, 220px)' : 'min(78vw, 360px)'}
-      height={compact ? 'min(56vw, 220px)' : 'min(78vw, 360px)'}
+      width={compact ? 'min(56vw, 220px)' : 'min(72vw, 300px)'}
+      height={compact ? 'min(56vw, 220px)' : 'min(72vw, 300px)'}
       role="img"
       aria-label={done ? 'Window closed' : `${display} remaining`}
     >
       <circle cx={cx} cy={cy} r={r + 10} fill="none" stroke="var(--line)" strokeWidth="1" />
+      {[0, 90, 180, 270].map((deg) => {
+        const rad = ((deg - 90) * Math.PI) / 180
+        const inner = r + 4
+        const outer = r + 10
+        return (
+          <line
+            key={deg}
+            x1={cx + Math.cos(rad) * inner}
+            y1={cy + Math.sin(rad) * inner}
+            x2={cx + Math.cos(rad) * outer}
+            y2={cy + Math.sin(rad) * outer}
+            stroke="var(--brass)"
+            strokeWidth="1.5"
+          />
+        )
+      })}
       <circle cx={cx} cy={cy} r={r} fill="var(--paper)" stroke="var(--line)" strokeWidth="1" />
       <circle
         cx={cx}

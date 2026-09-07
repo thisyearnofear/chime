@@ -1,13 +1,12 @@
 # CHIME
 
-Repo folder is still `imonmyway`. The product is **CHIME**.
+GitHub repo: [thisyearnofear/chime](https://github.com/thisyearnofear/chime).
+Production: [chimeapp.netlify.app](https://chimeapp.netlify.app).
 
 Read [`README.md`](README.md) and [`design.md`](design.md) before changing UI.
 
 - Floor: `/`
 - Watch: `/watch`
-- Setup: `/setup`
-- Desk: `/dashboard`
-- Roster: `/roster`
+- More → Setup `/setup`, Desk `/dashboard`, Roster `/roster`
 
 DreamDEX is the venue. No custom CLOB. No punctuality, GPS, or Solidity.

@@ -10,7 +10,7 @@ import { secondsLeft } from '@/lib/markets/format'
 
 export function FollowFadeBar() {
   const { window } = useMarketStore()
-  const { allegiance, defaultSize } = useAgentStore()
+  const { defaultSize } = useAgentStore()
   const { trade, pending, followed } = useFollowTrade()
   const net = getMarketNetwork()
 
@@ -19,7 +19,7 @@ export function FollowFadeBar() {
   const size = followed ? sizeForPersonality(followed.label, defaultSize) : defaultSize
 
   return (
-    <div className="mt-6">
+    <div>
       <p className="text-[12px] text-[var(--mute)] mb-3">
         {followed
           ? `${followed.label} · ${followed.side} · ${size} ${net.collateralSymbol}`

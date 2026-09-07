@@ -36,7 +36,6 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(196, 161, 90, 0.06), transparent 55%),
     repeating-linear-gradient(
       0deg,
       transparent,
@@ -54,6 +53,57 @@ body > * {
 .font-display {
   font-family: var(--font-display), "Times New Roman", serif;
   font-style: normal;
+}
+
+.tick {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+}
+
+.tick-tl {
+  top: -1px;
+  left: -1px;
+  border-top: 1px solid var(--brass);
+  border-left: 1px solid var(--brass);
+}
+
+.tick-tr {
+  top: -1px;
+  right: -1px;
+  border-top: 1px solid var(--brass);
+  border-right: 1px solid var(--brass);
+}
+
+.tick-bl {
+  bottom: -1px;
+  left: -1px;
+  border-bottom: 1px solid var(--brass);
+  border-left: 1px solid var(--brass);
+}
+
+.tick-br {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 1px solid var(--brass);
+  border-right: 1px solid var(--brass);
+}
+
+@keyframes chime-mark {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.045);
+  }
+}
+
+.chime-mark {
+  display: inline-block;
+  transform-origin: left center;
+  animation: chime-mark 0.7s ease-out 1;
 }
 
 .sr-only {

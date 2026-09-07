@@ -1,45 +1,10 @@
-# Optimal Deployment Strategy: Hetzner + Netlify
+# CHIME deploy
 
-## 🏗️ Architecture Overview
+Ship the Next.js app on Netlify. Do not revive the old Hetzner / Socket.IO / Postgres layout.
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Netlify       │    │   Hetzner VPS    │    │   Blockchain    │
-│   (Frontend)    │◄──►│   (Backend)      │◄──►│   (Somnia)      │
-│                 │    │                  │    │                 │
-│ • Next.js App   │    │ • Socket.IO      │    │ • Smart         │
-│ • Static Assets │    │ • Database       │    │   Contracts     │
-│ • CDN           │    │ • Real-time API  │    │ • Wallet Conn   │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-```
+- Config: [`netlify.toml`](../../netlify.toml)
+- Notes: [`../README.md`](../README.md)
+- Production URL: https://chimeapp.netlify.app
+- Repo: https://github.com/thisyearnofear/chime
 
-## 🎯 Recommended Setup
-
-### Frontend (Netlify)
-- Deploy static Next.js build
-- Fast global CDN
-- Automatic deployments from Git
-
-### Backend (Hetzner VPS)
-- Socket.IO server for real-time features
-- PostgreSQL database
-- API endpoints
-- WebSocket connections
-
-## 🚀 Implementation Plan
-
-### 1. Hetzner Backend Setup
-- Deploy `backend-server.js` to your VPS
-- Set up PostgreSQL database
-- Configure PM2 for process management
-- Set up reverse proxy (nginx)
-
-### 2. Frontend Configuration
-- Build static version for Netlify
-- Point API calls to Hetzner backend
-- Configure CORS for cross-origin requests
-
-### 3. Environment Variables
-- Separate configs for frontend/backend
-- Secure API endpoints
-- Database connection strings
+Set `NEXT_PUBLIC_BASE_URL=https://chimeapp.netlify.app` in the Netlify env so Open Graph and metadata resolve to the live host.
