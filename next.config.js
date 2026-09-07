@@ -4,6 +4,14 @@ const nextConfig = {
     unoptimized: true
   },
   turbopack: {},
+  transpilePackages: ['@somnia-chain/markets-sdk', '@somnia-chain/reactivity'],
+  serverExternalPackages: ['ws', 'bufferutil'],
+  async redirects() {
+    return [
+      { source: '/rankings', destination: '/roster', permanent: false },
+      { source: '/commitment/:path*', destination: '/', permanent: false },
+    ]
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -15,9 +23,6 @@ const nextConfig = {
     }
     return config;
   },
-  env: {
-    DISABLE_REALTIME: 'true', // Flag to disable Socket.IO features
-  }
 };
 
 export default nextConfig;

@@ -42,6 +42,7 @@ export async function chatCompletion(
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
+    signal: AbortSignal.timeout(4000),
     body: JSON.stringify({
       model: provider.model,
       messages,
@@ -49,7 +50,6 @@ export async function chatCompletion(
       max_tokens: 500,
     }),
   })
-
   if (!response.ok) {
     const text = await response.text()
     throw new Error(`${provider.name} error ${response.status}: ${text}`)

@@ -22,11 +22,11 @@ export function formatDistance(miles: number): string {
   return `${miles.toFixed(1)} mi`
 }
 
-export function generateShareUrl(sharingId: string): string {
+export function generateShareUrl(asset = 'BTC', windowLabel = '15m'): string {
   if (typeof window !== 'undefined') {
-    return `${window.location.origin}/watch/${sharingId}`
+    return `${window.location.origin}/?asset=${asset}&window=${windowLabel}`
   }
-  return `/watch/${sharingId}`
+  return `/?asset=${asset}&window=${windowLabel}`
 }
 
 export function copyToClipboard(text: string): Promise<void> {

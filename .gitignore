@@ -110,6 +110,7 @@ credentials.json
 tmp_*
 *.tmp
 /generated/prisma
+.data/
 
 # ===============
 # Deployment files

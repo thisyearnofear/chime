@@ -1,63 +1,59 @@
-import type { Metadata } from "next";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
-import "./globals.css";
-import { PremiumNavigation } from "@/components/layout/PremiumNavigation";
-import { GlobalErrorBoundary } from '@/components/core/GlobalErrorBoundary';
-import { ToastProvider } from '@/components/unified/UnifiedToast';
+import type { Metadata } from 'next'
+import { Newsreader, JetBrains_Mono } from 'next/font/google'
+import './globals.css'
+import { ShellNav } from '@/components/layout/ShellNav'
+import { GlobalErrorBoundary } from '@/components/core/GlobalErrorBoundary'
+import { ToastProvider } from '@/components/unified/UnifiedToast'
 
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-display",
-  display: "swap",
-});
+const newsreader = Newsreader({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-display',
+  display: 'swap',
+})
 
 const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-jetbrains",
-  display: "swap",
-});
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-jetbrains',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: "IMONMYWAY — Autonomous Punctuality Protocol on Somnia",
+  title: 'CHIME — Agents take a side. You follow or fade.',
   description:
-    "Deploy an AI agent that stakes, negotiates, and settles punctuality commitments autonomously on Somnia's Agentic L1. No human intervention after setup.",
+    'Personality agents call DreamDEX Event Contract windows on Somnia. Spectate the debate, then follow or fade with one tap.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   icons: {
     icon: '/IOMYfavicon.ico',
     apple: '/IOMYsquare.png',
   },
   openGraph: {
-  title: "IMONMYWAY — Autonomous Punctuality Protocol",
-  description: "Your AI agent bets on your punctuality. Autonomous staking, agent-to-agent negotiation, and real-time settlement on Somnia.",
-  images: ['/IOMYbanner.png'],
+    title: 'CHIME — Follow or fade the window',
+    description: 'Two agents. One BTC or ETH window. You pick a side. DreamDEX settles it.',
+    images: ['/IOMYbanner.png'],
   },
-};
+}
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
-      <body className="min-h-screen bg-graphite-900 text-white antialiased" suppressHydrationWarning={true}>
+    <html lang="en" className={`${newsreader.variable} ${jetbrainsMono.variable}`} suppressHydrationWarning>
+      <body className="min-h-screen bg-[var(--paper)] text-[var(--ink)] antialiased" suppressHydrationWarning>
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-gold-500 focus:text-graphite-900 focus:rounded-lg focus:font-semibold"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[100] focus:px-3 focus:py-2 focus:bg-[var(--brass)] focus:text-[var(--paper)]"
         >
           Skip to content
         </a>
         <ToastProvider>
           <GlobalErrorBoundary enableRecovery={true} showErrorDetails={process.env.NODE_ENV === 'development'}>
-            <PremiumNavigation />
-            <main id="main-content" className="relative pt-20">
+            <ShellNav />
+            <main id="main-content" className="relative pt-20 sm:pt-14">
               {children}
             </main>
           </GlobalErrorBoundary>
         </ToastProvider>
       </body>
     </html>
-  );
+  )
 }

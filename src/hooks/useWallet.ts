@@ -1,9 +1,24 @@
 import { useState, useEffect, useCallback } from 'react'
+import { createWalletClient, createPublicClient, custom, http, type Address, type WalletClient } from 'viem'
 import { useUIStore } from '@/stores/uiStore'
 import { useAddToast } from '@/components/unified/UnifiedToast'
-import { getNetworkConfig } from '@/contracts/addresses'
+import { getNetworkConfig, getMarketNetwork } from '@/lib/markets/config'
+import { defineChain } from 'viem'
 
 const activeNetwork = getNetworkConfig()
+const marketNet = getMarketNetwork()
+
+export const somniaChain = defineChain({
+  id: marketNet.chainId,
+  name: marketNet.name,
+  nativeCurrency: marketNet.nativeCurrency,
+  rpcUrls: {
+    default: { http: [marketNet.rpcUrl], webSocket: [marketNet.wsRpcUrl] },
+  },
+  blockExplorers: {
+    default: { name: 'Explorer', url: marketNet.blockExplorer },
+  },
+})
 
 const SOMNIA_NETWORK_PARAMS_FOR_WALLET = {
   chainId: `0x${activeNetwork.chainId.toString(16)}`,
@@ -20,7 +35,7 @@ interface WalletState {
   chainId: number | null
   balance: string | null
   networkMetrics: {
-    lastTxSpeed: number | null // in seconds
+    lastTxSpeed: number | null
     avgBlockTime: number | null
     isOnSomnia: boolean
   }
@@ -31,6 +46,7 @@ interface UseWalletReturn extends WalletState {
   disconnect: () => void
   switchToSomnia: () => Promise<boolean>
   trackTransactionSpeed: (txHash: string) => Promise<void>
+  getWalletClient: () => WalletClient | null
 }
 
 export function useWallet(): UseWalletReturn {
@@ -49,32 +65,36 @@ export function useWallet(): UseWalletReturn {
 
   const { updateNetworkMetrics } = useUIStore()
   const addToast = useAddToast()
-  const provider = typeof window !== 'undefined' ? (window as any).ethereum : null
+  const provider = typeof window !== 'undefined' ? window.ethereum : undefined
   const isInstalled = !!provider
 
-  // Check if MetaMask is installed
-  const isMetaMaskInstalled = useCallback(() => {
-    return isInstalled && provider !== null
-  }, [isInstalled, provider])
+  const isMetaMaskInstalled = useCallback(() => isInstalled && !!provider, [isInstalled, provider])
 
-  // Get current account and chain
+  const getWalletClient = useCallback((): WalletClient | null => {
+    if (!provider || !walletState.address) return null
+    return createWalletClient({
+      account: walletState.address as Address,
+      chain: somniaChain,
+      transport: custom(provider),
+    })
+  }, [provider, walletState.address])
+
   const updateWalletState = useCallback(async () => {
     if (!isMetaMaskInstalled() || !provider) return
 
     try {
-      // Add timeout to prevent hanging on provider calls
-      const timeout = (ms: number) => new Promise((_, reject) => 
+      const timeout = (ms: number) => new Promise((_, reject) =>
         setTimeout(() => reject(new Error('Provider request timeout')), ms)
       )
 
       const accounts = await Promise.race([
         provider.request({ method: 'eth_accounts' }),
-        timeout(5000)
+        timeout(5000),
       ]) as string[]
 
       const chainId = await Promise.race([
         provider.request({ method: 'eth_chainId' }),
-        timeout(5000)
+        timeout(5000),
       ]) as string
 
       if (accounts.length > 0) {
@@ -83,19 +103,23 @@ export function useWallet(): UseWalletReturn {
             method: 'eth_getBalance',
             params: [accounts[0], 'latest'],
           }),
-          timeout(5000)
+          timeout(5000),
         ]) as string
 
-        setWalletState(prev => ({
+        setWalletState((prev) => ({
           ...prev,
           address: accounts[0],
           isConnected: true,
           isConnecting: false,
           chainId: parseInt(chainId, 16),
-          balance: (parseInt(balance, 16) / 1e18).toFixed(4), // Convert wei to ETH
+          balance: (parseInt(balance, 16) / 1e18).toFixed(4),
+          networkMetrics: {
+            ...prev.networkMetrics,
+            isOnSomnia: parseInt(chainId, 16) === activeNetwork.chainId,
+          },
         }))
       } else {
-        setWalletState(prev => ({
+        setWalletState((prev) => ({
           ...prev,
           address: null,
           isConnected: false,
@@ -105,15 +129,10 @@ export function useWallet(): UseWalletReturn {
       }
     } catch (error) {
       console.warn('Wallet provider timeout or error:', error)
-      // Don't show error toast for timeout, just log it
-      setWalletState(prev => ({
-        ...prev,
-        isConnecting: false,
-      }))
+      setWalletState((prev) => ({ ...prev, isConnecting: false }))
     }
   }, [isMetaMaskInstalled, provider])
 
-  // Connect wallet
   const connect = useCallback(async () => {
     if (!isMetaMaskInstalled()) {
       addToast({
@@ -123,7 +142,7 @@ export function useWallet(): UseWalletReturn {
       return
     }
 
-    setWalletState(prev => ({ ...prev, isConnecting: true }))
+    setWalletState((prev) => ({ ...prev, isConnecting: true }))
 
     try {
       if (!provider) throw new Error('MetaMask not available')
@@ -131,8 +150,7 @@ export function useWallet(): UseWalletReturn {
       await provider.request({ method: 'eth_requestAccounts' })
       await updateWalletState()
 
-      // Auto-add Somnia network if not already added
-      const currentChainId = await provider.request({ method: 'eth_chainId' })
+      const currentChainId = (await provider.request({ method: 'eth_chainId' })) as string
       const isOnSomnia = parseInt(currentChainId, 16) === activeNetwork.chainId
 
       if (!isOnSomnia) {
@@ -141,43 +159,22 @@ export function useWallet(): UseWalletReturn {
             method: 'wallet_addEthereumChain',
             params: [SOMNIA_NETWORK_PARAMS_FOR_WALLET],
           })
-          addToast({
-            type: 'success',
-            message: 'Somnia Network added to MetaMask! 🚀',
-          })
-        } catch (addError) {
+          addToast({ type: 'success', message: 'Somnia Network added to MetaMask.' })
+        } catch {
           console.log('User declined adding Somnia network')
         }
       }
 
-      // Update network metrics
-      setWalletState(prev => ({
-        ...prev,
-        networkMetrics: {
-          ...prev.networkMetrics,
-          isOnSomnia: parseInt(currentChainId, 16) === activeNetwork.chainId,
-        },
-      }))
-
-      // Wallet connected — agent state is on-chain
-
-      addToast({
-        type: 'success',
-        message: 'Wallet connected successfully!',
-      })
-    } catch (error: any) {
-      console.error('Error connecting wallet:', error)
-      addToast({
-        type: 'error',
-        message: error.message || 'Failed to connect wallet',
-      })
-      setWalletState(prev => ({ ...prev, isConnecting: false }))
+      addToast({ type: 'success', message: 'Wallet connected.' })
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Failed to connect wallet'
+      addToast({ type: 'error', message })
+      setWalletState((prev) => ({ ...prev, isConnecting: false }))
     }
   }, [isMetaMaskInstalled, updateWalletState, addToast, provider])
 
-  // Disconnect wallet
   const disconnect = useCallback(() => {
-    setWalletState(prev => ({
+    setWalletState((prev) => ({
       ...prev,
       address: null,
       isConnected: false,
@@ -185,109 +182,51 @@ export function useWallet(): UseWalletReturn {
       chainId: null,
       balance: null,
     }))
-    addToast({
-      type: 'info',
-      message: 'Wallet disconnected',
-    })
+    addToast({ type: 'info', message: 'Wallet disconnected' })
   }, [addToast])
 
-  // Switch to Somnia Network
   const switchToSomnia = useCallback(async () => {
     if (!provider) {
       updateNetworkMetrics({ isOnSomnia: false })
-      addToast({
-        message: 'MetaMask not detected. Please install MetaMask to continue.',
-        type: 'error',
-      })
+      addToast({ message: 'MetaMask not detected.', type: 'error' })
       return false
     }
 
     try {
-      // Try to switch to Somnia network
       await provider.request({
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: SOMNIA_NETWORK_PARAMS_FOR_WALLET.chainId }],
       })
-
       updateNetworkMetrics({ isOnSomnia: true })
-      addToast({
-        message: 'Successfully switched to Somnia Network! 🎉',
-        type: 'success',
-      })
+      addToast({ message: 'Switched to Somnia.', type: 'success' })
       return true
-    } catch (switchError: any) {
-      // If network doesn't exist, add it
-      if (switchError.code === 4902) {
+    } catch (switchError: unknown) {
+      const code = (switchError as { code?: number }).code
+      if (code === 4902) {
         try {
-          addToast({
-            message: 'Adding Somnia Network to MetaMask...',
-            type: 'info',
-          })
-
           await provider.request({
             method: 'wallet_addEthereumChain',
             params: [SOMNIA_NETWORK_PARAMS_FOR_WALLET],
           })
-
           updateNetworkMetrics({ isOnSomnia: true })
-          addToast({
-            message: 'Somnia Network added and activated! ✅',
-            type: 'success',
-          })
+          addToast({ message: 'Somnia Network added.', type: 'success' })
           return true
-        } catch (addError: any) {
-          console.error('Failed to add Somnia network:', addError)
-          updateNetworkMetrics({ isOnSomnia: false })
-
-          let errorMessage = 'Failed to add Somnia Network to MetaMask.'
-          if (addError.code === 4001) {
-            errorMessage = 'Network addition cancelled by user.'
-          } else if (addError.code === -32002) {
-            errorMessage = 'MetaMask is already processing a request. Please check MetaMask.'
-          } else if (addError.message?.includes('Invalid RPC URL')) {
-            errorMessage = 'Invalid RPC URL detected. Please contact support.'
-          }
-
-          addToast({
-            message: errorMessage,
-            type: 'error',
-          })
+        } catch {
+          addToast({ message: 'Failed to add Somnia Network.', type: 'error' })
           return false
         }
-      } else {
-        console.error('Failed to switch to Somnia network:', switchError)
-        updateNetworkMetrics({ isOnSomnia: false })
-
-        let errorMessage = 'Failed to switch to Somnia Network.'
-        if (switchError.code === 4001) {
-          errorMessage = 'Network switch cancelled by user.'
-        } else if (switchError.code === -32002) {
-          errorMessage = 'MetaMask is busy. Please check MetaMask and try again.'
-        } else if (switchError.message?.includes('Unrecognized chain ID')) {
-          errorMessage = 'Network configuration error. The chain ID may be incorrect.'
-        } else if (switchError.message?.includes('Invalid RPC URL')) {
-          errorMessage = 'RPC connection failed. Please check your internet connection.'
-        }
-
-        addToast({
-          message: errorMessage + " Please ensure you're using the latest MetaMask version.",
-          type: 'error',
-        })
-        return false
       }
+      addToast({ message: 'Failed to switch to Somnia.', type: 'error' })
+      return false
     }
   }, [addToast, updateNetworkMetrics, provider])
 
-  // Listen for account and chain changes
   useEffect(() => {
     if (!isMetaMaskInstalled() || !provider) return
 
     const handleAccountsChanged = (accounts: string[]) => {
-      if (accounts.length === 0) {
-        disconnect()
-      } else {
-        updateWalletState()
-      }
+      if (accounts.length === 0) disconnect()
+      else updateWalletState()
     }
 
     const handleChainChanged = () => {
@@ -296,44 +235,30 @@ export function useWallet(): UseWalletReturn {
 
     provider.on('accountsChanged', handleAccountsChanged)
     provider.on('chainChanged', handleChainChanged)
-
-    // Initial state check — pre-existing pattern; suppressing for parity
-    // with the mount-time load convention used elsewhere in the app.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     updateWalletState()
 
     return () => {
-      if (provider) {
-        provider.removeListener('accountsChanged', handleAccountsChanged)
-        provider.removeListener('chainChanged', handleChainChanged)
-      }
+      provider.removeListener('accountsChanged', handleAccountsChanged)
+      provider.removeListener('chainChanged', handleChainChanged)
     }
   }, [isMetaMaskInstalled, updateWalletState, disconnect, provider])
 
-  // Track transaction speed for Somnia showcase
   const trackTransactionSpeed = useCallback(async (txHash: string) => {
     if (!provider) return
-
     const startTime = Date.now()
-    const ethersProvider = new (await import('ethers')).BrowserProvider(provider)
-
     try {
-      await ethersProvider.waitForTransaction(txHash)
-      const endTime = Date.now()
-      const speed = (endTime - startTime) / 1000
-
-      setWalletState(prev => ({
-        ...prev,
-        networkMetrics: {
-          ...prev.networkMetrics,
-          lastTxSpeed: speed,
-        },
-      }))
-
-      addToast({
-        type: 'success',
-        message: `Transaction confirmed in ${speed.toFixed(1)}s on Somnia! ⚡`,
+      const publicClient = createPublicClient({
+        chain: somniaChain,
+        transport: http(marketNet.rpcUrl),
       })
+      await publicClient.waitForTransactionReceipt({ hash: txHash as `0x${string}` })
+      const speed = (Date.now() - startTime) / 1000
+      setWalletState((prev) => ({
+        ...prev,
+        networkMetrics: { ...prev.networkMetrics, lastTxSpeed: speed },
+      }))
+      addToast({ type: 'success', message: `Confirmed in ${speed.toFixed(1)}s on Somnia.` })
     } catch (error) {
       console.error('Transaction tracking failed:', error)
     }
@@ -345,16 +270,16 @@ export function useWallet(): UseWalletReturn {
     disconnect,
     switchToSomnia,
     trackTransactionSpeed,
+    getWalletClient,
   }
 }
 
-// Type declarations for window.ethereum
 declare global {
   interface Window {
     ethereum?: {
-      request: (args: { method: string; params?: any[] }) => Promise<any>
-      on: (event: string, callback: (...args: any[]) => void) => void
-      removeListener: (event: string, callback: (...args: any[]) => void) => void
+      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>
+      on: (event: string, callback: (...args: never[]) => void) => void
+      removeListener: (event: string, callback: (...args: never[]) => void) => void
     }
   }
 }
