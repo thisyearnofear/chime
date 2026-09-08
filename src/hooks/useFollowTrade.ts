@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useAgentStore } from '@/stores/agentStore'
 import { useMarketStore } from '@/stores/marketStore'
 import { usePositionStore } from '@/stores/positionStore'
@@ -10,7 +11,7 @@ import { useAddToast } from '@/components/unified/UnifiedToast'
 import { placeFollowOrder, TradeError } from '@/lib/markets/trade'
 import { sizeForPersonality } from '@/lib/agents/mapping'
 import { getMarketNetwork } from '@/lib/markets/config'
-import { explorerTx } from '@/lib/markets/format'
+import { explorerTx, formatSide } from '@/lib/markets/format'
 import type { Side } from '@/types/markets'
 
 export function useFollowTrade() {
@@ -24,6 +25,7 @@ export function useFollowTrade() {
   }, [address, hydrate])
   const { rebind } = useExchange()
   const addToast = useAddToast()
+  const router = useRouter()
   const net = getMarketNetwork()
 
   const followed = decision?.seats.find((s) => s.label === allegiance) ?? decision?.seats[0]
@@ -54,12 +56,13 @@ export function useFollowTrade() {
         detail: `${size} ${net.collateralSymbol}`,
         side,
         txHash,
+        marketId: window.marketId,
       })
       addToast({
         type: 'success',
-        message: txHash
-          ? `${intent === 'follow' ? 'Follow' : 'Fade'} sent · ${txHash.slice(0, 10)}…`
-          : `${intent === 'follow' ? 'Follow' : 'Fade'} submitted.`,
+        duration: 8000,
+        message: `Filled ${formatSide(side)} · ${size} ${net.collateralSymbol}. Desk has the ticket.`,
+        action: { label: 'Desk', onClick: () => router.push('/dashboard') },
       })
       if (txHash) {
         void trackTransactionSpeed(txHash)
@@ -68,7 +71,7 @@ export function useFollowTrade() {
     } catch (error) {
       const code = error instanceof TradeError ? error.code : 'TRADE'
       const message = error instanceof Error ? error.message : 'Trade failed'
-      addToast({ type: code === 'DEMO' ? 'warning' : 'error', message })
+      addToast({ type: code === 'DEMO' || code === 'NO_FILL' ? 'warning' : 'error', message })
     } finally {
       setPending(false)
     }
@@ -88,6 +91,7 @@ export function useFollowTrade() {
     net.collateralSymbol,
     net.blockExplorer,
     trackTransactionSpeed,
+    router,
   ])
 
   return { trade, pending, followed }

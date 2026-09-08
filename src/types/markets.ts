@@ -48,6 +48,7 @@ export interface TimelineEvent {
   detail?: string
   side?: Side
   txHash?: string
+  marketId?: string
 }
 
 export interface MidSample {

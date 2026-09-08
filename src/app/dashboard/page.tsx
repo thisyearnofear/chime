@@ -23,6 +23,17 @@ export default function DashboardPage() {
   const { lastTxHash } = usePositionStore()
   const { balance, networkMetrics } = useWallet()
   const { isConnected, connect, positions, fills, events, loading, claiming, claimable, claim } = useDesk()
+  const waitingOnIndexer = Boolean(
+    lastTxHash && !fills.some((fill) => fill.txHash?.toLowerCase() === lastTxHash.toLowerCase())
+  )
+  const openTicket = positions.some((p) => p.status === 'Trading' || p.status === 'Locked' || p.status === 'Settling')
+  const claimLabel = claiming
+    ? 'Claiming…'
+    : claimable
+      ? 'Claim winnings'
+      : openTicket
+        ? 'Claim after the bell'
+        : 'Scan & claim'
   const net = getMarketNetwork()
   const followed = decision?.seats.find((s) => s.label === allegiance)
 
@@ -99,15 +110,24 @@ export default function DashboardPage() {
 
         <div className="mt-8">
           <Tap onClick={() => void claim()} disabled={claiming || !isConnected}>
-            {claiming ? 'Claiming…' : claimable ? 'Claim winnings' : 'Scan & claim'}
+            {claimLabel}
           </Tap>
+          <p className="mt-3 text-[12px] text-[var(--mute)]">
+            {claimable
+              ? 'Resolved windows pay here.'
+              : 'Claim unlocks when the window finalizes. Scan still checks settled books.'}
+          </p>
         </div>
       </Frame>
 
       <Frame label="POSITIONS" meta={loading ? 'reading' : `${positions.length}`}>
         {positions.length === 0 && (
           <p className="py-4 text-[13px] text-[var(--mute)]">
-            {isConnected ? 'No outcome shares on this wallet yet.' : 'Connect to see open windows.'}
+            {!isConnected
+              ? 'Connect to see open windows.'
+              : waitingOnIndexer
+                ? 'Fill sent — indexer catching up. Last tx is above.'
+                : 'No outcome shares on this wallet yet.'}
           </p>
         )}
         <ul>
@@ -129,7 +149,11 @@ export default function DashboardPage() {
       <Frame label="LEDGER" meta={ledger.length ? `${ledger.length}` : 'empty'}>
         <ol>
           {ledger.length === 0 && (
-            <li className="py-4 text-[13px] text-[var(--mute)]">Follow or fade a window. Fills land here.</li>
+            <li className="py-4 text-[13px] text-[var(--mute)]">
+              {waitingOnIndexer
+                ? 'Waiting on the fill tape. Your tx is already on Shannon.'
+                : 'Follow or fade a window. Fills land here.'}
+            </li>
           )}
           {ledger.map((row) => (
             <li key={fillKey(row)} className="py-4 border-t border-[var(--line)] first:border-t-0 text-[13px]">

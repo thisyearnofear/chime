@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src/",
+    "prove:loop": "node scripts/prove-loop.mjs",
+    "prove:seat": "node scripts/prove-loop.mjs --seat",
     "prepare": "husky"
   },
   "dependencies": {

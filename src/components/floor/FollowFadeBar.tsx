@@ -1,17 +1,20 @@
 'use client'
 
+import Link from 'next/link'
 import { Tap } from '@/components/ui/Tap'
 import { useFollowTrade } from '@/hooks/useFollowTrade'
 import { useMarketStore } from '@/stores/marketStore'
 import { useAgentStore } from '@/stores/agentStore'
+import { usePositionStore } from '@/stores/positionStore'
 import { getMarketNetwork } from '@/lib/markets/config'
 import { sizeForPersonality } from '@/lib/agents/mapping'
-import { secondsLeft } from '@/lib/markets/format'
+import { formatSide, secondsLeft } from '@/lib/markets/format'
 
 export function FollowFadeBar() {
   const { window } = useMarketStore()
   const { defaultSize } = useAgentStore()
   const { trade, pending, followed } = useFollowTrade()
+  const stake = usePositionStore((s) => s.events.find((e) => e.type === 'follow' || e.type === 'fade'))
   const net = getMarketNetwork()
 
   const locked =
@@ -40,6 +43,13 @@ export function FollowFadeBar() {
       )}
       {window?.demo && (
         <p className="text-[12px] text-[var(--brass)] mt-3">Demo clock. Live books are on Watch.</p>
+      )}
+      {stake?.side && (
+        <p className="text-[12px] text-[var(--brass)] mt-3">
+          you&apos;re on {formatSide(stake.side)}
+          {stake.detail ? ` · ${stake.detail}` : ''} ·{' '}
+          <Link href="/dashboard">Desk</Link>
+        </p>
       )}
     </div>
   )

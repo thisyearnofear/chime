@@ -19,6 +19,7 @@ export type MarketsExchange = {
       isResolved?: boolean
       isVoided?: boolean
       winningOutcome?: number
+      quoteDecimals?: number
     }>
     getOutcomeBalance?: (q: Record<string, unknown>) => Promise<bigint>
     getPortfolio?: (

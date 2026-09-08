@@ -7,12 +7,14 @@ import { usePositionStore } from '@/stores/positionStore'
 import { loadDesk } from '@/lib/markets/desk'
 import { redeemWinnings, TradeError } from '@/lib/markets/trade'
 import { useAddToast } from '@/components/unified/UnifiedToast'
+import { useMarketStore } from '@/stores/marketStore'
 import type { DeskFill, DeskPosition } from '@/types/markets'
 
 export function useDesk() {
   const { address, isConnected, connect } = useWallet()
   const { rebind } = useExchange()
-  const { events, hydrate, setLastTxHash } = usePositionStore()
+  const { events, hydrate, lastTxHash, setLastTxHash } = usePositionStore()
+  const window = useMarketStore((s) => s.window)
   const addToast = useAddToast()
   const [positions, setPositions] = useState<DeskPosition[]>([])
   const [fills, setFills] = useState<DeskFill[]>([])
@@ -28,7 +30,7 @@ export function useDesk() {
     setLoading(true)
     try {
       await rebind()
-      const desk = await loadDesk(address)
+      const desk = await loadDesk(address, window)
       setPositions(desk.positions)
       setFills(desk.fills)
     } catch (error) {
@@ -36,7 +38,7 @@ export function useDesk() {
     } finally {
       setLoading(false)
     }
-  }, [address, isConnected, rebind])
+  }, [address, isConnected, rebind, window])
 
   useEffect(() => {
     hydrate(address)
@@ -48,6 +50,19 @@ export function useDesk() {
     void refresh()
   }, [refresh])
 
+  useEffect(() => {
+    if (!isConnected || !lastTxHash) return
+    const indexed = fills.some((fill) => fill.txHash?.toLowerCase() === lastTxHash.toLowerCase())
+    if (indexed) return
+    let n = 0
+    const id = setInterval(() => {
+      n += 1
+      void refresh()
+      if (n >= 12) clearInterval(id)
+    }, 3000)
+    return () => clearInterval(id)
+  }, [isConnected, lastTxHash, fills, refresh])
+
   const claim = useCallback(async () => {
     setClaiming(true)
     try {
@@ -56,7 +71,9 @@ export function useDesk() {
       if (hashes[0]) setLastTxHash(hashes[0])
       addToast({
         type: claimed ? 'success' : 'info',
-        message: claimed ? `Claimed ${claimed} position(s).` : 'Nothing to claim on resolved windows.',
+        message: claimed
+          ? `Claimed ${claimed} position(s).`
+          : 'Nothing payable yet. Claim unlocks after the window finalizes.',
       })
       await refresh()
     } catch (error) {

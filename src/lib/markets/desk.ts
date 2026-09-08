@@ -2,8 +2,9 @@
 
 import { formatUnits } from 'viem'
 import { getExchange } from './exchange'
+import { getMarketNetwork } from './config'
 import { formatInterval } from './format'
-import type { DeskFill, DeskPosition, Side } from '@/types/markets'
+import type { DeskFill, DeskPosition, LiveWindow, Side } from '@/types/markets'
 
 export type PortfolioMarket = {
   id: string
@@ -106,12 +107,89 @@ export function mapTrade(row: RawTrade): DeskFill {
   }
 }
 
-export async function loadDesk(account: string): Promise<{ positions: DeskPosition[]; fills: DeskFill[] }> {
+function onchainStatus(status: number): string {
+  return ['Listed', 'Trading', 'Locked', 'Settling', 'Resolved', 'Voided'][status] ?? 'Trading'
+}
+
+export async function loadChainSeat(account: string, window: LiveWindow): Promise<DeskPosition[]> {
+  if (window.demo || !window.marketId.startsWith('0x')) return []
   const ex = await getExchange()
-  if (!ex.client.getPortfolio) return { positions: [], fills: [] }
-  const portfolio = await ex.client.getPortfolio(account, { tradesLimit: 80, ordersLimit: 20 })
-  return {
-    positions: (portfolio.positions ?? []).map(mapPosition),
-    fills: (portfolio.trades ?? []).map(mapTrade),
+  if (!ex.client.getOutcomeBalance) return []
+  const oc = await ex.client.getMarketOnchain(window.marketId as `0x${string}`)
+  if (!oc.outcomeToken || oc.yesId == null || oc.noId == null) return []
+
+  const decimals = oc.quoteDecimals ?? getMarketNetwork().collateralDecimals
+  const status = onchainStatus(Number(oc.status))
+  const expiry = Number(oc.expiry ?? window.expiry)
+  const market: PortfolioMarket = {
+    id: window.marketId,
+    marketAddress: String(oc.marketAddress ?? ''),
+    asset: window.asset,
+    status,
+    expiry: String(expiry),
+    intervalSec: String(window.intervalSec),
+    interval: formatInterval(window.intervalSec),
+    quoteDecimals: Number(decimals) || 6,
+    winningOutcome: oc.winningOutcome ?? null,
+    voided: Boolean(oc.isVoided),
   }
+
+  const rows: DeskPosition[] = []
+  for (const [outcomeIndex, id] of [
+    [0, oc.yesId],
+    [1, oc.noId],
+  ] as const) {
+    const balance = await ex.client.getOutcomeBalance({
+      outcomeToken: oc.outcomeToken,
+      account,
+      id,
+    })
+    if (!balance || balance === BigInt(0)) continue
+    rows.push(mapPosition({ outcomeIndex, balance: balance.toString(), market }))
+  }
+  return rows
+}
+
+function mergePositions(indexed: DeskPosition[], chain: DeskPosition[]): DeskPosition[] {
+  const extra = chain.filter(
+    (row) =>
+      !indexed.some(
+        (p) => p.marketId.toLowerCase() === row.marketId.toLowerCase() && p.outcomeIdx === row.outcomeIdx
+      )
+  )
+  return [...extra, ...indexed]
+}
+
+export async function loadDesk(
+  account: string,
+  window?: LiveWindow | null
+): Promise<{ positions: DeskPosition[]; fills: DeskFill[] }> {
+  const ex = await getExchange()
+  let chain: DeskPosition[] = []
+  if (window && !window.demo) {
+    try {
+      chain = await loadChainSeat(account, window)
+    } catch (error) {
+      console.warn('desk chain seat', error)
+    }
+  }
+
+  let indexed: { positions: DeskPosition[]; fills: DeskFill[] } = { positions: [], fills: [] }
+  try {
+    if (ex.client.getPortfolio) {
+      const portfolio = await Promise.race([
+        ex.client.getPortfolio(account, { tradesLimit: 80, ordersLimit: 20 }),
+        new Promise<never>((_, reject) => {
+          setTimeout(() => reject(new Error('portfolio timeout')), 8000)
+        }),
+      ])
+      indexed = {
+        positions: (portfolio.positions ?? []).map(mapPosition),
+        fills: (portfolio.trades ?? []).map(mapTrade),
+      }
+    }
+  } catch (error) {
+    console.warn('desk portfolio', error)
+  }
+  return { positions: mergePositions(indexed.positions, chain), fills: indexed.fills }
 }

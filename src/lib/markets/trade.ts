@@ -18,7 +18,7 @@ export async function placeFollowOrder(input: {
   window: LiveWindow
   side: Side
   size: number
-}): Promise<{ txHash?: string }> {
+}): Promise<{ txHash?: string; filled: number }> {
   if (input.window.demo) {
     throw new TradeError('DEMO', 'This window is a demo feed. Live order books are not listed on this network yet.')
   }
@@ -87,11 +87,17 @@ export async function placeFollowOrder(input: {
       const txHash =
         (order as { txHash?: string }).txHash ??
         order.info?.receipt?.transactionHash
-      return { txHash }
+      const filled = Number((order as { filled?: number }).filled ?? NaN)
+      if (Number.isFinite(filled) && filled <= 0) {
+        throw new TradeError('NO_FILL', 'No size on the book. Try another cadence.')
+      }
+      return { txHash, filled: Number.isFinite(filled) ? filled : amount }
     } catch (error) {
+      if (error instanceof TradeError && error.code === 'NO_FILL') throw error
       lastError = error
     }
   }
+  if (lastError instanceof TradeError) throw lastError
   if (lastError instanceof Error) throw lastError
   throw new TradeError('ORDER_FAILED', 'Could not place IOC on this window.')
 }

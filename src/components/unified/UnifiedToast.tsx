@@ -316,12 +316,19 @@ export function useAchievementToast() {
  */
 export function useAddToast() {
   const { addToast } = useToast();
-  return (toast: { type: ToastData["type"]; message: string; title?: string; duration?: number }) =>
+  return (toast: {
+    type: ToastData["type"];
+    message: string;
+    title?: string;
+    duration?: number;
+    action?: ToastData["action"];
+  }) =>
     addToast({
       type: toast.type,
       message: toast.message,
       title: toast.title,
       duration: toast.duration,
+      action: toast.action,
     });
 }
 
