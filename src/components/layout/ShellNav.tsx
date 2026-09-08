@@ -85,7 +85,7 @@ export function ShellNav() {
   const { address, isConnected, connect, disconnect } = useWallet()
 
   return (
-    <header className="fixed top-0 inset-x-0 z-50 border-b border-[var(--line)] bg-[var(--paper)]/92 backdrop-blur-sm">
+    <header className="fixed top-0 inset-x-0 z-50 border-b border-[var(--line)] bg-[var(--paper)]">
       <div className="mx-auto max-w-6xl px-4 h-14 flex items-center justify-between gap-3">
         <Link href="/" className="chime-mark font-display text-[22px] text-[var(--ink)] leading-none">
           CHIME

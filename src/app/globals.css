@@ -8,6 +8,9 @@
   --brass: #c4a15a;
   --slate: #7d847c;
   --halt: #c45c4a;
+  --gap: 1rem;
+  --pad: 1.25rem;
+  --tick: 8px;
   --background: #100e0b;
   --foreground: #ece7dc;
   --primary: #c4a15a;
@@ -57,8 +60,8 @@ body > * {
 
 .tick {
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: var(--tick);
+  height: var(--tick);
   pointer-events: none;
 }
 
@@ -104,6 +107,12 @@ body > * {
   display: inline-block;
   transform-origin: left center;
   animation: chime-mark 0.7s ease-out 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chime-mark {
+    animation: none;
+  }
 }
 
 .sr-only {

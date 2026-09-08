@@ -26,7 +26,7 @@ export function Frame({
           {meta ? <span className="text-right">{meta}</span> : null}
         </div>
       )}
-      <div className="p-5 md:p-6">{children}</div>
+      <div className="p-[var(--pad)]">{children}</div>
     </section>
   )
 }

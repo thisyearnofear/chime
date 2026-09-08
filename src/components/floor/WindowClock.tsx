@@ -37,6 +37,8 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
   const dash = circ * remain
   const display = !window ? '—' : done ? 'CHIME' : formatCountdown(left)
   const cadence = window ? `${window.asset} ${formatInterval(window.intervalSec)}` : '…'
+  const ringR = r - (compact ? 14 : 18)
+  const ringCirc = 2 * Math.PI * ringR
 
   useEffect(() => {
     if (!window) return
@@ -58,11 +60,13 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
       role="img"
       aria-label={done ? 'Window closed' : `${display} remaining`}
     >
-      <circle cx={cx} cy={cy} r={r + 10} fill="none" stroke="var(--line)" strokeWidth="1" />
-      {[0, 90, 180, 270].map((deg) => {
+      <circle cx={cx} cy={cy} r={r + 12} fill="none" stroke="var(--line)" strokeWidth="1" />
+      {Array.from({ length: 12 }, (_, i) => {
+        const deg = i * 30
         const rad = ((deg - 90) * Math.PI) / 180
-        const inner = r + 4
-        const outer = r + 10
+        const cardinal = deg % 90 === 0
+        const inner = r + (cardinal ? 4 : 7)
+        const outer = r + 12
         return (
           <line
             key={deg}
@@ -70,8 +74,8 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
             y1={cy + Math.sin(rad) * inner}
             x2={cx + Math.cos(rad) * outer}
             y2={cy + Math.sin(rad) * outer}
-            stroke="var(--brass)"
-            strokeWidth="1.5"
+            stroke={cardinal ? 'var(--brass)' : 'var(--line)'}
+            strokeWidth={cardinal ? 1.5 : 1}
           />
         )
       })}
@@ -90,29 +94,31 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
       />
       {hasBook && (
         <>
+          <circle cx={cx} cy={cy} r={ringR} fill="none" stroke="var(--line)" strokeWidth="1" />
           <circle
             cx={cx}
             cy={cy}
-            r={r - 16}
+            r={ringR}
             fill="none"
             stroke="var(--brass)"
-            strokeWidth="8"
-            strokeDasharray={`${(r - 16) * 2 * Math.PI * up} ${(r - 16) * 2 * Math.PI}`}
+            strokeWidth="4"
+            strokeDasharray={`${ringCirc * up} ${ringCirc}`}
             transform={`rotate(-90 ${cx} ${cy})`}
           />
           <circle
             cx={cx}
             cy={cy}
-            r={r - 16}
+            r={ringR}
             fill="none"
             stroke="var(--slate)"
-            strokeWidth="8"
-            strokeDasharray={`${(r - 16) * 2 * Math.PI * (1 - up)} ${(r - 16) * 2 * Math.PI}`}
-            strokeDashoffset={-((r - 16) * 2 * Math.PI * up)}
+            strokeWidth="4"
+            strokeDasharray={`${ringCirc * (1 - up)} ${ringCirc}`}
+            strokeDashoffset={-(ringCirc * up)}
             transform={`rotate(-90 ${cx} ${cy})`}
           />
         </>
       )}
+      <circle cx={cx} cy={cy} r={compact ? 52 : 78} fill="none" stroke="var(--line)" strokeWidth="1" />
       <text
         x={cx}
         y={cy - 4}

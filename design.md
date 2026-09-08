@@ -34,13 +34,13 @@ One accent. Down is pewter, not violet.
 
 ## Layout
 
-- Slim top rail: CHIME · Floor Watch More · wallet
+- Slim top rail: CHIME · Floor Watch More · wallet. Solid paper, no blur.
 - More holds Setup, Desk, Roster
-- Floor is two framed panels: WINDOW left, PIT right
-- Each frame has inset rules and brass corner ticks
-- Window rail: LIVE · cadence · collateral
-- Pit rail: 01 / 02
-- Clock is the hero object. Seats are numbered spec rows
+- Shared shell: `Page` — `max-w-6xl`, `--gap` 16px, `--pad` 20px. Watch/Setup/Desk/Roster snap to the same left edge as Floor
+- Floor is two framed panels: WINDOW left, PIT right, `gap-[var(--gap)]`
+- Each frame has inset rules and brass corner ticks (`--tick` 8px)
+- Clock is a layered instrument: 12 outer ticks (cardinals brass), remaining arc, implied-Up ring, inner numeral well
+- Seats are numbered spec rows (`01` / `02` stay mute)
 - One verbal hero under the clock: *Two seats. One window. Follow or fade.*
 - Floor switcher shows **live windows only**; Watch owns the catalog
 - Hide the book until a bid or ask exists
@@ -52,7 +52,7 @@ One accent. Down is pewter, not violet.
 
 ## Motion
 
-Clock tick. One scale pulse on CHIME. No magnet, ping, shimmer, or float.
+Clock tick. One scale pulse on CHIME. Honor `prefers-reduced-motion`. No magnet, ping, shimmer, or float.
 
 ## Do not ship
 

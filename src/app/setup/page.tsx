@@ -7,6 +7,7 @@ import { useWallet } from '@/hooks/useWallet'
 import { useExchange } from '@/hooks/useExchange'
 import { Tap } from '@/components/ui/Tap'
 import { Frame } from '@/components/ui/Frame'
+import { Page, PageHead } from '@/components/layout/Page'
 import { getMarketNetwork } from '@/lib/markets/config'
 import { faucetCollateral, TradeError } from '@/lib/markets/trade'
 import { useAddToast } from '@/components/unified/UnifiedToast'
@@ -65,12 +66,10 @@ export default function SetupPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 md:py-10">
-      <h1 className="font-display text-4xl text-[var(--ink)]">Setup</h1>
-      <p className="mt-2 mb-6 text-[13px] text-[var(--mute)]">
-        Pick who you ride with. Size is set here so the floor stays two taps.
-      </p>
+    <Page>
+      <PageHead title="Setup">Pick who you ride with. Size is set here so the floor stays two taps.</PageHead>
 
+      <div className="max-w-3xl">
       <Frame label="ALLEGIANCE" meta={`${net.collateralSymbol} · ${net.name}`}>
       <div className="flex flex-col">
         {PERSONALITY_PRESETS.map((p) => {
@@ -124,6 +123,7 @@ export default function SetupPage() {
         )}
       </div>
       </Frame>
-    </div>
+      </div>
+    </Page>
   )
 }

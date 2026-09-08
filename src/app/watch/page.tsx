@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { WindowClock } from '@/components/floor/WindowClock'
 import { Frame } from '@/components/ui/Frame'
+import { Page, PageHead } from '@/components/layout/Page'
 import { listLiveSeries } from '@/lib/markets/windows'
 import { formatInterval, impliedUp } from '@/lib/markets/format'
 import type { LiveWindow } from '@/types/markets'
@@ -31,17 +32,14 @@ export default function WatchPage() {
   }, [])
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 md:py-10">
-      <h1 className="font-display text-4xl text-[var(--ink)]">Watch</h1>
-      <p className="mt-2 text-[13px] text-[var(--mute)] max-w-md">
-        Live series on this venue. Tap a clock to stand on that floor.
-      </p>
+    <Page>
+      <PageHead title="Watch">Live series on this venue. Tap a clock to stand on that floor.</PageHead>
 
       {loading && windows.length === 0 && (
-        <p className="mt-10 text-[13px] text-[var(--mute)]">Listing windows…</p>
+        <p className="text-[13px] text-[var(--mute)]">Listing windows…</p>
       )}
 
-      <div className="mt-8 grid sm:grid-cols-2 gap-4">
+      <div className="grid sm:grid-cols-2 gap-[var(--gap)]">
         {windows.map((w) => (
           <Link
             key={w.marketId}
@@ -57,6 +55,6 @@ export default function WatchPage() {
           </Link>
         ))}
       </div>
-    </div>
+    </Page>
   )
 }

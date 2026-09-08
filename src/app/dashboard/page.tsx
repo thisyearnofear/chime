@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Tap } from '@/components/ui/Tap'
 import { Frame } from '@/components/ui/Frame'
+import { Page, PageHead } from '@/components/layout/Page'
 import { useAgentStore } from '@/stores/agentStore'
 import { useWallet } from '@/hooks/useWallet'
 import { useDesk } from '@/hooks/useDesk'
@@ -32,10 +33,10 @@ export default function DashboardPage() {
   const ledger = [...sessionOnly, ...chainFills].sort((a, b) => (b.at ?? 0) - (a.at ?? 0))
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 md:py-10">
-      <h1 className="font-display text-4xl text-[var(--ink)]">Desk</h1>
-      <p className="mt-2 mb-6 text-[13px] text-[var(--mute)]">Positions from chain. Claim when a window finalizes.</p>
+    <Page>
+      <PageHead title="Desk">Positions from chain. Claim when a window finalizes.</PageHead>
 
+      <div className="max-w-3xl flex flex-col gap-[var(--gap)]">
       <Frame label="DESK" meta={isConnected ? net.name : 'offline'}>
         {!isConnected && (
           <div className="flex items-center justify-between gap-4">
@@ -103,7 +104,7 @@ export default function DashboardPage() {
         </div>
       </Frame>
 
-      <Frame label="POSITIONS" meta={loading ? 'reading' : `${positions.length}`} className="mt-4">
+      <Frame label="POSITIONS" meta={loading ? 'reading' : `${positions.length}`}>
         {positions.length === 0 && (
           <p className="py-4 text-[13px] text-[var(--mute)]">
             {isConnected ? 'No outcome shares on this wallet yet.' : 'Connect to see open windows.'}
@@ -125,7 +126,7 @@ export default function DashboardPage() {
         </ul>
       </Frame>
 
-      <Frame label="LEDGER" meta={ledger.length ? `${ledger.length}` : 'empty'} className="mt-4">
+      <Frame label="LEDGER" meta={ledger.length ? `${ledger.length}` : 'empty'}>
         <ol>
           {ledger.length === 0 && (
             <li className="py-4 text-[13px] text-[var(--mute)]">Follow or fade a window. Fills land here.</li>
@@ -148,6 +149,7 @@ export default function DashboardPage() {
           ))}
         </ol>
       </Frame>
-    </div>
+      </div>
+    </Page>
   )
 }

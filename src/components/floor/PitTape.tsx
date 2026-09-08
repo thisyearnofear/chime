@@ -15,7 +15,7 @@ export function PitTape() {
   const events = usePositionStore((s) => s.events)
 
   const follows: TapeRow[] = events
-    .filter((e) => e.type === 'follow' || e.type === 'fade')
+    .filter((e): e is typeof e & { type: 'follow' | 'fade' } => e.type === 'follow' || e.type === 'fade')
     .map((e) => ({
       id: e.id,
       at: e.at,

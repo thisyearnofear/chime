@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { PERSONALITY_PRESETS } from '@/lib/personality-presets'
 import { Frame } from '@/components/ui/Frame'
+import { Page, PageHead } from '@/components/layout/Page'
 import type { RosterRow } from '@/types/markets'
 
 export default function RosterPage() {
@@ -30,11 +31,12 @@ export default function RosterPage() {
   }, [])
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 md:py-10">
-      <h1 className="font-display text-4xl text-[var(--ink)]">Roster</h1>
-      <p className="mt-2 mb-6 text-[13px] text-[var(--mute)] max-w-lg">
-        House agents paper-trade against DreamDEX resolution. Voids are pushes. Pending means the window closed and the oracle has not printed.
-      </p>
+    <Page>
+      <PageHead title="Roster">
+        House agents paper-trade against DreamDEX resolution. Voids are pushes. Pending means the window closed
+        and the oracle has not printed.
+      </PageHead>
+      <div className="max-w-3xl">
       <Frame label="HOUSE" meta={loaded ? 'scored' : 'scoring'}>
       <ul>
         {PERSONALITY_PRESETS.map((p, index) => {
@@ -58,6 +60,7 @@ export default function RosterPage() {
       </ul>
       {!loaded && <p className="mt-4 text-[12px] text-[var(--mute)]">Scoring…</p>}
       </Frame>
-    </div>
+      </div>
+    </Page>
   )
 }

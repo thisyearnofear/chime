@@ -3,7 +3,7 @@
 GitHub repo: [thisyearnofear/chime](https://github.com/thisyearnofear/chime).
 Production: [usechime.netlify.app](https://usechime.netlify.app).
 
-Read [`README.md`](README.md) and [`design.md`](design.md) before changing UI.
+Read [`README.md`](README.md), [`design.md`](design.md), and `.cursor/skills/chime-floor/SKILL.md` before changing UI.
 
 - Floor: `/`
 - Watch: `/watch`

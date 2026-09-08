@@ -10,6 +10,7 @@ import { DebateTicker } from './DebateTicker'
 import { FollowFadeBar } from './FollowFadeBar'
 import { SeriesSwitcher } from './SeriesSwitcher'
 import { Frame } from '@/components/ui/Frame'
+import { Page } from '@/components/layout/Page'
 import { useLiveWindow } from '@/hooks/useLiveWindow'
 import { useWindowAgents } from '@/hooks/useWindowAgents'
 import { useAgentStore } from '@/stores/agentStore'
@@ -47,12 +48,12 @@ export function Floor() {
     !window ? '…' : window.demo ? 'DEMO' : window.status === 1 ? 'LIVE' : 'LOCKED'
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-6 md:py-10">
+    <Page>
       <div className="mb-4">
         <SeriesSwitcher series={window ? { asset: window.asset, intervalSec: window.intervalSec } : series} />
       </div>
 
-      <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)] gap-4 lg:gap-5 items-start">
+      <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)] gap-[var(--gap)] items-start">
         <Frame
           label="WINDOW"
           meta={
@@ -91,6 +92,6 @@ export function Floor() {
           />
         </Frame>
       </div>
-    </section>
+    </Page>
   )
 }
