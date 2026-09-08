@@ -42,12 +42,25 @@ export interface WindowDecision {
 
 export interface TimelineEvent {
   id: string
-  type: 'take' | 'taunt' | 'follow' | 'fade' | 'fill' | 'resolve' | 'claim' | 'system'
+  type: 'take' | 'taunt' | 'follow' | 'fade' | 'fill' | 'resolve' | 'claim' | 'system' | 'print'
   at: number
   title: string
   detail?: string
   side?: Side
   txHash?: string
+}
+
+export interface MidSample {
+  at: number
+  mid: number
+}
+
+export interface TapeRow {
+  id: string
+  at: number
+  kind: 'print' | 'follow' | 'fade'
+  text: string
+  side?: Side
 }
 
 export interface DeskPosition {

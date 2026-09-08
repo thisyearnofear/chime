@@ -51,7 +51,7 @@ export function useFollowTrade() {
         type: intent,
         at: Date.now(),
         title: `${intent === 'follow' ? 'Followed' : 'Faded'} ${followed.label}`,
-        detail: `${side.toUpperCase()} · ${size} ${net.collateralSymbol}`,
+        detail: `${size} ${net.collateralSymbol}`,
         side,
         txHash,
       })

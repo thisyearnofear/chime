@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { WindowClock } from './WindowClock'
 import { ProbabilityRail } from './ProbabilityRail'
+import { ImpliedSpark } from './ImpliedSpark'
 import { AgentPit } from './AgentPit'
 import { DebateTicker } from './DebateTicker'
 import { FollowFadeBar } from './FollowFadeBar'
@@ -13,7 +14,7 @@ import { useLiveWindow } from '@/hooks/useLiveWindow'
 import { useWindowAgents } from '@/hooks/useWindowAgents'
 import { useAgentStore } from '@/stores/agentStore'
 import { useExchange } from '@/hooks/useExchange'
-import { seriesFromSearch } from '@/stores/marketStore'
+import { seriesFromSearch, useMarketStore } from '@/stores/marketStore'
 import { getPersonality } from '@/lib/personality-presets'
 import { formatInterval, impliedUp } from '@/lib/markets/format'
 import { getMarketNetwork } from '@/lib/markets/config'
@@ -29,6 +30,7 @@ export function Floor() {
   const allegiance = useAgentStore((s) => s.allegiance)
   const setAllegiance = useAgentStore((s) => s.setAllegiance)
   const setDefaultSize = useAgentStore((s) => s.setDefaultSize)
+  const mids = useMarketStore((s) => s.mids)
   useExchange()
 
   useEffect(() => {
@@ -65,6 +67,7 @@ export function Floor() {
           <p className="mt-5 text-[15px] text-[var(--ink)]">Two seats. One window. Follow or fade.</p>
           <div className="mt-3">
             <DebateTicker seats={decision?.seats} />
+            <ImpliedSpark mids={mids} window={window} />
             <ProbabilityRail window={window} />
           </div>
           {usingDemo && (
@@ -80,7 +83,12 @@ export function Floor() {
         </Frame>
 
         <Frame label="PIT" meta="01 / 02">
-          <AgentPit seats={decision?.seats} allegiance={allegiance} action={<FollowFadeBar />} />
+          <AgentPit
+            seats={decision?.seats}
+            allegiance={allegiance}
+            onPick={setAllegiance}
+            action={<FollowFadeBar />}
+          />
         </Frame>
       </div>
     </section>

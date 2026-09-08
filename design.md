@@ -44,6 +44,9 @@ One accent. Down is pewter, not violet.
 - One verbal hero under the clock: *Two seats. One window. Follow or fade.*
 - Floor switcher shows **live windows only**; Watch owns the catalog
 - Hide the book until a bid or ask exists
+- Implied-up sparkline under the clock: last ~40 mids, no axes. Halt stroke in the last 30s
+- Seat rows are tappable allegiance. Follow/Fade stays a separate control
+- Pit tape: at most six prints and follows, under seat 02
 - Follow/Fade sits under the followed seat on desktop; under the clock on mobile so the taps stay on screen
 - Ticker is one quote line, only after seats exist
 
