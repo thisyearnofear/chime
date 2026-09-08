@@ -1,7 +1,7 @@
 # CHIME
 
 GitHub repo: [thisyearnofear/chime](https://github.com/thisyearnofear/chime).
-Production: [chimeapp.netlify.app](https://chimeapp.netlify.app).
+Production: [usechime.netlify.app](https://usechime.netlify.app).
 
 Read [`README.md`](README.md) and [`design.md`](design.md) before changing UI.
 

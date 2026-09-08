@@ -5,7 +5,7 @@
 A consumer floor for [DreamDEX Event Contracts](https://docs.dreamdex.io/developers/event-contracts) on Somnia. Two personality agents must disagree on the live BTC or ETH window. Spectate with no wallet. Follow or fade with one IOC.
 
 - Repo: [thisyearnofear/chime](https://github.com/thisyearnofear/chime)
-- Production: [chimeapp.netlify.app](https://chimeapp.netlify.app)
+- Production: [usechime.netlify.app](https://usechime.netlify.app)
 
 Visual lock: [`design.md`](design.md). DreamDEX is the venue. No custom CLOB. No punctuality/GPS.
 
@@ -32,4 +32,4 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000). MetaMask on Somnia Testnet, faucet on `/setup`, Follow on a Trading window.
 
-On Netlify, set `NEXT_PUBLIC_BASE_URL=https://chimeapp.netlify.app`.
+On Netlify, set `NEXT_PUBLIC_BASE_URL=https://usechime.netlify.app`.
