@@ -15,6 +15,7 @@ const MORE = [
   { href: '/setup', label: 'Setup' },
   { href: '/dashboard', label: 'Desk' },
   { href: '/roster', label: 'Roster' },
+  { href: '/help', label: 'Glossary' },
 ]
 
 function MoreMenu({ pathname }: { pathname: string }) {

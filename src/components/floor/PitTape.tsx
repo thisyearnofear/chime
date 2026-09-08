@@ -27,7 +27,13 @@ export function PitTape() {
     }))
 
   const rows = [...follows, ...prints].sort((a, b) => b.at - a.at).slice(0, 6)
-  if (rows.length === 0) return null
+  if (rows.length === 0) {
+    return (
+      <p className="mt-5 pt-4 border-t border-[var(--line)] text-[11px] text-[var(--mute)]">
+        No prints yet — fills and follows show up here.
+      </p>
+    )
+  }
 
   return (
     <ol className="mt-5 pt-4 border-t border-[var(--line)]">

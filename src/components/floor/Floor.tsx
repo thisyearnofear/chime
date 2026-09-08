@@ -66,6 +66,9 @@ export function Floor() {
             <WindowClock window={window} upProbability={up} locked={window ? window.status !== 1 : false} />
           </div>
           <p className="mt-5 text-[15px] text-[var(--ink)]">Two seats. One window. Follow or fade.</p>
+          <p className="mt-1 text-[12px] text-[var(--mute)]">
+            Follow rides the seat · fade takes the other side · winners claim on Desk
+          </p>
           <div className="mt-3">
             <DebateTicker seats={decision?.seats} />
             <ImpliedSpark mids={mids} window={window} />

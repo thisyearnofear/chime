@@ -7,7 +7,7 @@ Read [`README.md`](README.md), [`design.md`](design.md), and `.cursor/skills/chi
 
 - Floor: `/`
 - Watch: `/watch`
-- More → Setup `/setup`, Desk `/dashboard` (also `/desk`), Roster `/roster`
+- More → Setup `/setup`, Desk `/dashboard` (also `/desk`), Roster `/roster`, Glossary `/help`
 
 DreamDEX is the venue. No custom CLOB. No punctuality, GPS, or Solidity.
 Install with `npm install`. Netlify builds with npm.

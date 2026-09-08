@@ -14,6 +14,7 @@ Visual lock: [`design.md`](design.md). Agent lock: [`.cursor/skills/chime-floor/
 1. **Spectate** — `/` is the live clock and two seats.
 2. **Follow / Fade** — More → Setup sets allegiance and size. Testnet faucet lives there.
 3. **Claim** — More → Desk redeems Finalized shares. Roster is paper W/L.
+4. **Look it up** — More → Glossary explains windows, seats, cents, and the spark.
 
 ## Stack
 

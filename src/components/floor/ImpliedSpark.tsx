@@ -22,8 +22,14 @@ export function ImpliedSpark({
   mids: MidSample[]
   window: LiveWindow | null
 }) {
-  if (!window || mids.length === 0) return null
-  if (window.bestBid == null && window.bestAsk == null) return null
+  if (!window) return null
+  if (window.bestBid == null && window.bestAsk == null) {
+    return (
+      <p className="mt-4 text-[11px] text-[var(--mute)]">
+        No book yet — sparkline plots implied Up once a bid or ask prints.
+      </p>
+    )
+  }
 
   const halt = secondsLeft(window.expiry) < 30 || window.status !== 1
   const last = mids[mids.length - 1]
