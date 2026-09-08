@@ -44,6 +44,7 @@ export function AgentPit({
               <div className="flex items-baseline justify-between gap-3">
                 <h2 className="text-[15px] text-[var(--ink)]">
                   <span className="text-[11px] text-[var(--mute)] mr-2">{n}</span>
+                  {seat.icon ? <span aria-hidden className="mr-1.5 text-[13px]">{seat.icon}</span> : null}
                   {seat.label}
                 </h2>
                 <span

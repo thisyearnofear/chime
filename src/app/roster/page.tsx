@@ -46,6 +46,7 @@ export default function RosterPage() {
               <div className="flex items-baseline justify-between gap-4">
                 <h2 className="text-[15px] text-[var(--ink)]">
                   <span className="text-[11px] text-[var(--mute)] mr-2">{String(index + 1).padStart(2, '0')}</span>
+                  {p.icon ? <span aria-hidden className="mr-1.5 text-[13px]">{p.icon}</span> : null}
                   {p.label}
                 </h2>
                 <p className="text-[12px] text-[var(--mute)]">

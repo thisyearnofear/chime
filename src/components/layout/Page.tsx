@@ -8,8 +8,8 @@ export function Page({ children, className }: { children: ReactNode; className?:
 export function PageHead({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <header className="mb-6">
-      <h1 className="font-display text-4xl text-[var(--ink)]">{title}</h1>
-      {children ? <p className="mt-2 text-[13px] text-[var(--mute)] max-w-lg">{children}</p> : null}
+      <h1 className="text-[18px] font-medium text-[var(--ink)]">{title}</h1>
+      {children ? <p className="mt-2 text-[12px] text-[var(--mute)] max-w-lg">{children}</p> : null}
     </header>
   )
 }

@@ -5,6 +5,7 @@ import type { WindowDecision } from '@/types/markets'
 
 const cache = new Map<string, WindowDecision>()
 const MAX = 200
+const TTL_MS = 24 * 60 * 60 * 1000
 const FILE = join(process.cwd(), '.data', 'chime-decisions.json')
 
 function remapDecision(row: WindowDecision): WindowDecision {
@@ -53,10 +54,20 @@ function hydrate(): void {
 hydrate()
 
 export function getDecision(marketId: string): WindowDecision | undefined {
-  return cache.get(marketId)
+  const row = cache.get(marketId)
+  if (!row) return undefined
+  if (Date.now() - row.generatedAt > TTL_MS) {
+    cache.delete(marketId)
+    return undefined
+  }
+  return row
 }
 
 export function listDecisions(): WindowDecision[] {
+  const cutoff = Date.now() - TTL_MS
+  for (const [id, row] of cache) {
+    if (row.generatedAt < cutoff) cache.delete(id)
+  }
   return [...cache.values()].sort((a, b) => b.generatedAt - a.generatedAt)
 }
 

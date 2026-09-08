@@ -14,7 +14,7 @@ export const Tap = forwardRef<
       ref={ref}
       disabled={disabled}
       className={cn(
-        'h-11 px-5 text-[13px] font-medium tracking-wide transition-colors disabled:opacity-35 disabled:pointer-events-none',
+        'h-11 px-5 text-[13px] font-medium transition-colors disabled:opacity-35 disabled:pointer-events-none',
         tone === 'brass' && 'bg-[var(--brass)] text-[var(--paper)] hover:brightness-110',
         tone === 'ghost' && 'text-[var(--ink)] hover:text-[var(--brass)]',
         tone === 'line' &&
