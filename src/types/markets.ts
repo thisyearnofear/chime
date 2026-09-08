@@ -50,6 +50,28 @@ export interface TimelineEvent {
   txHash?: string
 }
 
+export interface DeskPosition {
+  marketId: string
+  marketAddress: string
+  asset: string
+  interval: string
+  expiry: number
+  side: Side
+  amountLabel: string
+  status: string
+  claimable: boolean
+  outcomeIdx: 0 | 1
+}
+
+export interface DeskFill {
+  id: string
+  at: number
+  title: string
+  detail?: string
+  txHash?: string
+  side?: Side
+}
+
 export interface RosterRow {
   label: string
   wins: number

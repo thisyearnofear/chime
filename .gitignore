@@ -1,140 +1,61 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# ===============
 # Dependencies
-# ===============
 node_modules/
 /.pnp
 .pnp.js
 .yarn/install-state.gz
 
-# ===============
 # Logs
-# ===============
-logs
 *.log
 *.log.*
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 
-# ===============
-# Testing
-# ===============
+# Testing / Next / build
 coverage/
-
-# ===============
-# Next.js
-# ===============
 /.next/
 /out/
-
-# ===============
-# Build outputs
-# ===============
 /build
 /dist
 
-# ===============
-# Environment files (keep examples)
-# ===============
+# Environment
 .env
 .env.*
 !.env.example
 !.env.schema
-.envrc
-# Local overrides (already covered by .env.* but explicit for clarity)
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 
-# ===============
-# Misc caches
-# ===============
+# Caches
 .eslintcache
 .parcel-cache
 .turbo
 .cache
-
-# ===============
-# Production/hosting
-# ===============
-.vercel
-
-# ===============
-# TypeScript
-# ===============
 *.tsbuildinfo
 next-env.d.ts
-
-# ===============
-# OS files
-# ===============
-.DS_Store
-Thumbs.db
-
-# ===============
-# Certificates/keys
-# ===============
-*.pem
-*.key
-*.keystore
-*.json.key
-wallet*.json
-secrets.json
-credentials.json
-
-# ===============
-# Secrets & private keys
-# ===============
-.secret
-.secrets
-*.secret
-.env.local
-.env.*.local
-
-# ===============
-# Editors/IDE
-# ===============
-.vscode/*
-!.vscode/settings.json
-!.vscode/extensions.json
-!.vscode/tasks.json
-!.vscode/launch.json
-.idea/
-
-# ===============
-# Temp files
-# ===============
-tmp_*
-*.tmp
-/generated/prisma
 .data/
 
-# ===============
-# Deployment files
-# ===============
-deployment-*.json
+# Hosting
+.vercel
 
-# ===============
-# Prisma migrations
-# ===============
-/prisma/migrations/**/*.sql
-
-# ===============
-# Qoder/Qodo
-# ===============
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
 /.qoder/
 /.qodo/
 
-# ===============
-# Artifacts/Cache
-# ===============
-/artifacts/
-/cache/
+# Secrets
+*.pem
+*.key
+*.keystore
+wallet*.json
+secrets.json
+credentials.json
+.secret
+.secrets
+*.secret
 
-# ===============
-# Backend
-# ===============
-/backend/
+# Temp
+tmp_*
+*.tmp

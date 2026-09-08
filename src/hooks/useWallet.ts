@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createWalletClient, createPublicClient, custom, http, type Address, type WalletClient } from 'viem'
-import { useUIStore } from '@/stores/uiStore'
 import { useAddToast } from '@/components/unified/UnifiedToast'
 import { getNetworkConfig, getMarketNetwork } from '@/lib/markets/config'
 import { defineChain } from 'viem'
@@ -36,7 +35,6 @@ interface WalletState {
   balance: string | null
   networkMetrics: {
     lastTxSpeed: number | null
-    avgBlockTime: number | null
     isOnSomnia: boolean
   }
 }
@@ -58,12 +56,10 @@ export function useWallet(): UseWalletReturn {
     balance: null,
     networkMetrics: {
       lastTxSpeed: null,
-      avgBlockTime: null,
       isOnSomnia: false,
     },
   })
 
-  const { updateNetworkMetrics } = useUIStore()
   const addToast = useAddToast()
   const provider = typeof window !== 'undefined' ? window.ethereum : undefined
   const isInstalled = !!provider
@@ -83,28 +79,27 @@ export function useWallet(): UseWalletReturn {
     if (!isMetaMaskInstalled() || !provider) return
 
     try {
-      const timeout = (ms: number) => new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Provider request timeout')), ms)
-      )
+      const timeout = (ms: number) =>
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Provider request timeout')), ms))
 
-      const accounts = await Promise.race([
+      const accounts = (await Promise.race([
         provider.request({ method: 'eth_accounts' }),
         timeout(5000),
-      ]) as string[]
+      ])) as string[]
 
-      const chainId = await Promise.race([
+      const chainId = (await Promise.race([
         provider.request({ method: 'eth_chainId' }),
         timeout(5000),
-      ]) as string
+      ])) as string
 
       if (accounts.length > 0) {
-        const balance = await Promise.race([
+        const balance = (await Promise.race([
           provider.request({
             method: 'eth_getBalance',
             params: [accounts[0], 'latest'],
           }),
           timeout(5000),
-        ]) as string
+        ])) as string
 
         setWalletState((prev) => ({
           ...prev,
@@ -187,7 +182,6 @@ export function useWallet(): UseWalletReturn {
 
   const switchToSomnia = useCallback(async () => {
     if (!provider) {
-      updateNetworkMetrics({ isOnSomnia: false })
       addToast({ message: 'MetaMask not detected.', type: 'error' })
       return false
     }
@@ -197,8 +191,8 @@ export function useWallet(): UseWalletReturn {
         method: 'wallet_switchEthereumChain',
         params: [{ chainId: SOMNIA_NETWORK_PARAMS_FOR_WALLET.chainId }],
       })
-      updateNetworkMetrics({ isOnSomnia: true })
       addToast({ message: 'Switched to Somnia.', type: 'success' })
+      await updateWalletState()
       return true
     } catch (switchError: unknown) {
       const code = (switchError as { code?: number }).code
@@ -208,8 +202,8 @@ export function useWallet(): UseWalletReturn {
             method: 'wallet_addEthereumChain',
             params: [SOMNIA_NETWORK_PARAMS_FOR_WALLET],
           })
-          updateNetworkMetrics({ isOnSomnia: true })
           addToast({ message: 'Somnia Network added.', type: 'success' })
+          await updateWalletState()
           return true
         } catch {
           addToast({ message: 'Failed to add Somnia Network.', type: 'error' })
@@ -219,24 +213,24 @@ export function useWallet(): UseWalletReturn {
       addToast({ message: 'Failed to switch to Somnia.', type: 'error' })
       return false
     }
-  }, [addToast, updateNetworkMetrics, provider])
+  }, [addToast, provider, updateWalletState])
 
   useEffect(() => {
     if (!isMetaMaskInstalled() || !provider) return
 
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) disconnect()
-      else updateWalletState()
+      else void updateWalletState()
     }
 
     const handleChainChanged = () => {
-      updateWalletState()
+      void updateWalletState()
     }
 
     provider.on('accountsChanged', handleAccountsChanged)
     provider.on('chainChanged', handleChainChanged)
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    updateWalletState()
+    void updateWalletState()
 
     return () => {
       provider.removeListener('accountsChanged', handleAccountsChanged)
@@ -244,25 +238,28 @@ export function useWallet(): UseWalletReturn {
     }
   }, [isMetaMaskInstalled, updateWalletState, disconnect, provider])
 
-  const trackTransactionSpeed = useCallback(async (txHash: string) => {
-    if (!provider) return
-    const startTime = Date.now()
-    try {
-      const publicClient = createPublicClient({
-        chain: somniaChain,
-        transport: http(marketNet.rpcUrl),
-      })
-      await publicClient.waitForTransactionReceipt({ hash: txHash as `0x${string}` })
-      const speed = (Date.now() - startTime) / 1000
-      setWalletState((prev) => ({
-        ...prev,
-        networkMetrics: { ...prev.networkMetrics, lastTxSpeed: speed },
-      }))
-      addToast({ type: 'success', message: `Confirmed in ${speed.toFixed(1)}s on Somnia.` })
-    } catch (error) {
-      console.error('Transaction tracking failed:', error)
-    }
-  }, [addToast, provider])
+  const trackTransactionSpeed = useCallback(
+    async (txHash: string) => {
+      if (!provider) return
+      const startTime = Date.now()
+      try {
+        const publicClient = createPublicClient({
+          chain: somniaChain,
+          transport: http(marketNet.rpcUrl),
+        })
+        await publicClient.waitForTransactionReceipt({ hash: txHash as `0x${string}` })
+        const speed = (Date.now() - startTime) / 1000
+        setWalletState((prev) => ({
+          ...prev,
+          networkMetrics: { ...prev.networkMetrics, lastTxSpeed: speed },
+        }))
+        addToast({ type: 'success', message: `Confirmed in ${speed.toFixed(1)}s on Somnia.` })
+      } catch (error) {
+        console.error('Transaction tracking failed:', error)
+      }
+    },
+    [addToast, provider]
+  )
 
   return {
     ...walletState,

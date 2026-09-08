@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useAgentStore } from '@/stores/agentStore'
 import { useMarketStore } from '@/stores/marketStore'
 import { usePositionStore } from '@/stores/positionStore'
@@ -16,8 +16,12 @@ import type { Side } from '@/types/markets'
 export function useFollowTrade() {
   const { window } = useMarketStore()
   const { decision, allegiance, defaultSize } = useAgentStore()
-  const { pending, setPending, pushEvent, setLastTxHash } = usePositionStore()
-  const { isConnected, connect, networkMetrics, switchToSomnia, trackTransactionSpeed } = useWallet()
+  const { pending, setPending, pushEvent, setLastTxHash, hydrate } = usePositionStore()
+  const { address, isConnected, connect, networkMetrics, switchToSomnia, trackTransactionSpeed } = useWallet()
+
+  useEffect(() => {
+    hydrate(address)
+  }, [address, hydrate])
   const { rebind } = useExchange()
   const addToast = useAddToast()
   const net = getMarketNetwork()

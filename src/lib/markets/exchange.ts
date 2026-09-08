@@ -21,6 +21,41 @@ export type MarketsExchange = {
       winningOutcome?: number
     }>
     getOutcomeBalance?: (q: Record<string, unknown>) => Promise<bigint>
+    getPortfolio?: (
+      account: string,
+      opts?: { tradesLimit?: number; ordersLimit?: number }
+    ) => Promise<{
+      positions: Array<{
+        outcomeIndex: number
+        balance: string
+        market: {
+          id: string
+          marketAddress: string
+          asset: string
+          status: string
+          expiry: string
+          intervalSec: string | null
+          interval: string | null
+          quoteDecimals: number
+          winningOutcome?: number | null
+          voided: boolean
+        }
+      }>
+      trades: Array<{
+        id: string
+        fillPrice: string
+        quantity: string
+        timestamp: string
+        txHash: string
+        side: string | null
+        market: {
+          asset: string
+          interval: string | null
+          expiry: string | null
+          quoteDecimals: number
+        }
+      }>
+    }>
   }
   trader?: {
     faucet?: (opts?: { amount?: bigint }) => Promise<unknown>

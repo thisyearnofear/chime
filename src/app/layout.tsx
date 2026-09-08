@@ -25,13 +25,13 @@ export const metadata: Metadata = {
     'Personality agents call DreamDEX Event Contract windows on Somnia. Spectate the debate, then follow or fade with one tap.',
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   icons: {
-    icon: '/IOMYfavicon.ico',
-    apple: '/IOMYsquare.png',
+    icon: '/favicon.ico',
+    apple: '/chime-square.png',
   },
   openGraph: {
     title: 'CHIME — Follow or fade the window',
     description: 'Two agents. One BTC or ETH window. You pick a side. DreamDEX settles it.',
-    images: ['/IOMYbanner.png'],
+    images: ['/chime-og.png'],
   },
 }
 
@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <ToastProvider>
-          <GlobalErrorBoundary enableRecovery={true} showErrorDetails={process.env.NODE_ENV === 'development'}>
+          <GlobalErrorBoundary showErrorDetails={process.env.NODE_ENV === 'development'}>
             <ShellNav />
             <main id="main-content" className="relative pt-14">
               {children}

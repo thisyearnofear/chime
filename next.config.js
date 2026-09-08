@@ -1,13 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    unoptimized: true
+    unoptimized: true,
   },
   turbopack: {},
-  transpilePackages: ['@somnia-chain/markets-sdk', '@somnia-chain/reactivity'],
+  transpilePackages: ['@somnia-chain/markets-sdk'],
   serverExternalPackages: ['ws', 'bufferutil'],
   async redirects() {
     return [
+      { source: '/desk', destination: '/dashboard', permanent: false },
       { source: '/rankings', destination: '/roster', permanent: false },
       { source: '/commitment/:path*', destination: '/', permanent: false },
     ]
@@ -19,10 +20,10 @@ const nextConfig = {
         fs: false,
         net: false,
         tls: false,
-      };
+      }
     }
-    return config;
+    return config
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig

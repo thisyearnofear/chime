@@ -1,6 +1,0 @@
-// ═══════════════════════════════════════════════════════════
-// Agent Contract Addresses (deployed 2026-06-10T07:51:52.463Z)
-// ═══════════════════════════════════════════════════════════
-AgentRegistry: '0x81F47d5BD7A79d75ee7d20F5a2cfcfDaf9d05775',
-PunctualityAgent: '0x372f97600f9eD8f32505dC6b66FC8b05bB2c7211',
-// PunctualityCore (already deployed): '0x6Ba7C599F33fCBe1A9a5848FDE4D4EFA495A25c9'

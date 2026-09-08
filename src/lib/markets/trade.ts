@@ -3,6 +3,7 @@
 import { snapPrice } from './format'
 import { getExchange } from './exchange'
 import { getMarketNetwork } from './config'
+import { isClaimable, type RawPosition } from './desk'
 import type { LiveWindow, Side } from '@/types/markets'
 
 export class TradeError extends Error {
@@ -107,57 +108,91 @@ export async function faucetCollateral(): Promise<void> {
   await ex.trader.faucet()
 }
 
-export async function redeemWinnings(): Promise<{ claimed: number; hashes: string[] }> {
+async function redeemHeld(input: {
+  marketId: string
+  account: string
+}): Promise<{ claimed: number; hashes: string[] }> {
   const ex = await getExchange()
-  const net = getMarketNetwork()
-  if (!ex.client.listBinaryMarkets || !ex.trader?.redeem) {
+  if (!ex.trader?.redeem || !ex.client.getOutcomeBalance) {
     throw new TradeError('NO_REDEEM', 'Redeem is unavailable on this SDK build.')
   }
-  const me = ex.walletAddress
-  if (!me) throw new TradeError('NO_SIGNER', 'Connect a wallet to claim.')
+  if (!input.marketId.startsWith('0x')) return { claimed: 0, hashes: [] }
 
-  const settled = (await ex.client.listBinaryMarkets({
-    venueId: net.venueId,
-    status: 'Finalized',
-    limit: 80,
-  })) as Record<string, unknown>[]
+  const oc = await ex.client.getMarketOnchain(input.marketId as `0x${string}`)
+  if (!oc.isResolved && !oc.isVoided) return { claimed: 0, hashes: [] }
+
+  const held = {
+    0: await ex.client.getOutcomeBalance({
+      outcomeToken: oc.outcomeToken,
+      account: input.account,
+      id: oc.yesId,
+    }),
+    1: await ex.client.getOutcomeBalance({
+      outcomeToken: oc.outcomeToken,
+      account: input.account,
+      id: oc.noId,
+    }),
+  }
+
+  const toClaim: Array<0 | 1> = oc.isVoided ? [0, 1] : [Number(oc.winningOutcome) as 0 | 1]
+  const hashes: string[] = []
+  let claimed = 0
+  for (const outcomeIdx of toClaim) {
+    if (!held[outcomeIdx] || held[outcomeIdx] === BigInt(0)) continue
+    const result = await ex.trader.redeem({
+      marketId: input.marketId,
+      market: oc.marketAddress,
+      outcomeToken: oc.outcomeToken,
+      outcomeIdx,
+      amount: held[outcomeIdx],
+    })
+    claimed += 1
+    const hash = (result as { receipt?: { transactionHash?: string } })?.receipt?.transactionHash
+    if (hash) hashes.push(hash)
+  }
+  return { claimed, hashes }
+}
+
+export async function redeemWinnings(account?: string): Promise<{ claimed: number; hashes: string[] }> {
+  const ex = await getExchange()
+  const net = getMarketNetwork()
+  const me = account ?? ex.walletAddress
+  if (!me) throw new TradeError('NO_SIGNER', 'Connect a wallet to claim.')
+  if (!ex.trader?.redeem) {
+    throw new TradeError('NO_REDEEM', 'Redeem is unavailable on this SDK build.')
+  }
 
   const hashes: string[] = []
   let claimed = 0
+  const seen = new Set<string>()
 
-  for (const row of settled) {
-    const marketId = String(row.marketId ?? '')
-    if (!marketId.startsWith('0x')) continue
-    const oc = await ex.client.getMarketOnchain(marketId as `0x${string}`)
-    if (!oc.isResolved && !oc.isVoided) continue
-    if (!ex.client.getOutcomeBalance) continue
-
-    const held = {
-      0: await ex.client.getOutcomeBalance({
-        outcomeToken: oc.outcomeToken,
-        account: me,
-        id: oc.yesId,
-      }),
-      1: await ex.client.getOutcomeBalance({
-        outcomeToken: oc.outcomeToken,
-        account: me,
-        id: oc.noId,
-      }),
+  if (ex.client.getPortfolio) {
+    const portfolio = await ex.client.getPortfolio(me, { tradesLimit: 0, ordersLimit: 0 })
+    for (const row of portfolio.positions ?? []) {
+      const pos = row as RawPosition
+      if (!isClaimable(pos.market, pos.outcomeIndex)) continue
+      const marketId = pos.market.id
+      if (!marketId.startsWith('0x') || seen.has(marketId.toLowerCase())) continue
+      seen.add(marketId.toLowerCase())
+      const result = await redeemHeld({ marketId, account: me })
+      claimed += result.claimed
+      hashes.push(...result.hashes)
     }
+  }
 
-    const toClaim: Array<0 | 1> = oc.isVoided ? [0, 1] : [Number(oc.winningOutcome) as 0 | 1]
-    for (const outcomeIdx of toClaim) {
-      if (!held[outcomeIdx] || held[outcomeIdx] === BigInt(0)) continue
-      const result = await ex.trader.redeem({
-        marketId,
-        market: oc.marketAddress,
-        outcomeToken: oc.outcomeToken,
-        outcomeIdx,
-        amount: held[outcomeIdx],
-      })
-      claimed += 1
-      const hash = (result as { receipt?: { transactionHash?: string } })?.receipt?.transactionHash
-      if (hash) hashes.push(hash)
+  if (claimed === 0 && ex.client.listBinaryMarkets) {
+    const settled = (await ex.client.listBinaryMarkets({
+      venueId: net.venueId,
+      status: 'Finalized',
+      limit: 40,
+    })) as Record<string, unknown>[]
+    for (const row of settled) {
+      const marketId = String(row.marketId ?? row.id ?? '')
+      if (!marketId.startsWith('0x') || seen.has(marketId.toLowerCase())) continue
+      seen.add(marketId.toLowerCase())
+      const result = await redeemHeld({ marketId, account: me })
+      claimed += result.claimed
+      hashes.push(...result.hashes)
     }
   }
 

@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { useWallet } from '@/hooks/useWallet'
-import { useWalletStore } from '@/stores/walletStore'
 import { cn } from '@/lib/utils'
 
 const PRIMARY = [
@@ -84,12 +83,6 @@ function MoreMenu({ pathname }: { pathname: string }) {
 export function ShellNav() {
   const pathname = usePathname()
   const { address, isConnected, connect, disconnect } = useWallet()
-  const { setWalletAddress, setWalletConnected } = useWalletStore()
-
-  useEffect(() => {
-    setWalletAddress(address)
-    setWalletConnected(isConnected)
-  }, [address, isConnected, setWalletAddress, setWalletConnected])
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 border-b border-[var(--line)] bg-[var(--paper)]/92 backdrop-blur-sm">

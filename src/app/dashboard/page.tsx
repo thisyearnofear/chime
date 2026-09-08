@@ -4,110 +4,149 @@ import Link from 'next/link'
 import { Tap } from '@/components/ui/Tap'
 import { Frame } from '@/components/ui/Frame'
 import { useAgentStore } from '@/stores/agentStore'
-import { usePositionStore } from '@/stores/positionStore'
 import { useWallet } from '@/hooks/useWallet'
-import { useExchange } from '@/hooks/useExchange'
-import { useMarketStore } from '@/stores/marketStore'
-import { redeemWinnings, TradeError } from '@/lib/markets/trade'
+import { useDesk } from '@/hooks/useDesk'
 import { getMarketNetwork } from '@/lib/markets/config'
-import { useAddToast } from '@/components/unified/UnifiedToast'
-import { useState } from 'react'
-import { formatInterval } from '@/lib/markets/format'
+import { explorerTx, formatInterval } from '@/lib/markets/format'
+import { useMarketStore } from '@/stores/marketStore'
+import { usePositionStore } from '@/stores/positionStore'
+import type { DeskFill, TimelineEvent } from '@/types/markets'
+
+function fillKey(row: { id?: string; txHash?: string; at?: number; title?: string }): string {
+  return row.txHash || row.id || `${row.at}-${row.title}`
+}
 
 export default function DashboardPage() {
   const { allegiance, decision } = useAgentStore()
-  const { events, lastTxHash } = usePositionStore()
   const { window } = useMarketStore()
-  const { isConnected, connect, balance, networkMetrics } = useWallet()
-  useExchange()
-  const addToast = useAddToast()
+  const { lastTxHash } = usePositionStore()
+  const { balance, networkMetrics } = useWallet()
+  const { isConnected, connect, positions, fills, events, loading, claiming, claimable, claim } = useDesk()
   const net = getMarketNetwork()
-  const [claiming, setClaiming] = useState(false)
-
-  const onClaim = async () => {
-    setClaiming(true)
-    try {
-      const { claimed } = await redeemWinnings()
-      addToast({
-        type: claimed ? 'success' : 'info',
-        message: claimed ? `Claimed ${claimed} position(s).` : 'Nothing to claim on recent Finalized windows.',
-      })
-    } catch (error) {
-      addToast({
-        type: 'error',
-        message: error instanceof TradeError || error instanceof Error ? error.message : 'Claim failed',
-      })
-    } finally {
-      setClaiming(false)
-    }
-  }
-
   const followed = decision?.seats.find((s) => s.label === allegiance)
+
+  const chainFills: Array<DeskFill | TimelineEvent> = fills
+  const sessionOnly = events.filter(
+    (event) => !event.txHash || !fills.some((fill) => fill.txHash?.toLowerCase() === event.txHash?.toLowerCase())
+  )
+  const ledger = [...sessionOnly, ...chainFills].sort((a, b) => (b.at ?? 0) - (a.at ?? 0))
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 md:py-10">
       <h1 className="font-display text-4xl text-[var(--ink)]">Desk</h1>
-      <p className="mt-2 mb-6 text-[13px] text-[var(--mute)]">Fills, claim, allegiance.</p>
+      <p className="mt-2 mb-6 text-[13px] text-[var(--mute)]">Positions from chain. Claim when a window finalizes.</p>
 
       <Frame label="DESK" meta={isConnected ? net.name : 'offline'}>
-      {!isConnected && (
-        <div className="flex items-center justify-between gap-4">
-          <p className="text-[13px] text-[var(--mute)]">Connect to see fills and claim winnings.</p>
-          <Tap tone="brass" onClick={() => void connect()}>
-            Connect
+        {!isConnected && (
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-[13px] text-[var(--mute)]">Connect to load fills and claim winnings.</p>
+            <Tap tone="brass" onClick={() => void connect()}>
+              Connect
+            </Tap>
+          </div>
+        )}
+
+        <dl className="mt-6 grid sm:grid-cols-2 gap-x-8 gap-y-4 text-[13px]">
+          <div>
+            <dt className="text-[var(--mute)]">Network</dt>
+            <dd>
+              {net.name}
+              {networkMetrics.isOnSomnia ? '' : ' · switch'}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--mute)]">Gas</dt>
+            <dd>
+              {balance || '0'} {net.nativeCurrency.symbol}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--mute)]">Allegiance</dt>
+            <dd>
+              {allegiance}{' '}
+              <Link href="/setup" className="text-[var(--brass)]">
+                change
+              </Link>
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--mute)]">Window</dt>
+            <dd>{window ? `${window.asset} ${formatInterval(window.intervalSec)}` : '—'}</dd>
+          </div>
+          <div>
+            <dt className="text-[var(--mute)]">Last tx</dt>
+            <dd>
+              {lastTxHash ? (
+                <a
+                  href={explorerTx(net.blockExplorer, lastTxHash)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[var(--brass)]"
+                >
+                  {lastTxHash.slice(0, 10)}…
+                </a>
+              ) : (
+                '—'
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-[var(--mute)]">Take</dt>
+            <dd>{followed?.line ?? 'Waiting for a take.'}</dd>
+          </div>
+        </dl>
+
+        <div className="mt-8">
+          <Tap onClick={() => void claim()} disabled={claiming || !isConnected}>
+            {claiming ? 'Claiming…' : claimable ? 'Claim winnings' : 'Scan & claim'}
           </Tap>
         </div>
-      )}
+      </Frame>
 
-      <dl className="mt-6 grid sm:grid-cols-2 gap-x-8 gap-y-4 text-[13px]">
-        <div>
-          <dt className="text-[var(--mute)]">Network</dt>
-          <dd>{net.name}{networkMetrics.isOnSomnia ? '' : ' · switch'}</dd>
-        </div>
-        <div>
-          <dt className="text-[var(--mute)]">Gas</dt>
-          <dd>{balance || '0'} {net.nativeCurrency.symbol}</dd>
-        </div>
-        <div>
-          <dt className="text-[var(--mute)]">Allegiance</dt>
-          <dd>
-            {allegiance}{' '}
-            <Link href="/setup" className="text-[var(--brass)]">
-              change
-            </Link>
-          </dd>
-        </div>
-        <div>
-          <dt className="text-[var(--mute)]">Window</dt>
-          <dd>{window ? `${window.asset} ${formatInterval(window.intervalSec)}` : '—'}</dd>
-        </div>
-        <div>
-          <dt className="text-[var(--mute)]">Last tx</dt>
-          <dd>{lastTxHash ? `${lastTxHash.slice(0, 10)}…` : '—'}</dd>
-        </div>
-        <div>
-          <dt className="text-[var(--mute)]">Take</dt>
-          <dd>{followed?.line ?? 'Waiting for a take.'}</dd>
-        </div>
-      </dl>
-
-      <div className="mt-8">
-        <Tap onClick={() => void onClaim()} disabled={claiming || !isConnected}>
-          {claiming ? 'Claiming…' : 'Claim winnings'}
-        </Tap>
-      </div>
-
-      <ol className="mt-12 border-t border-[var(--line)]">
-        {events.length === 0 && (
-          <li className="py-6 text-[13px] text-[var(--mute)]">Follow or fade a window. The chain starts here.</li>
+      <Frame label="POSITIONS" meta={loading ? 'reading' : `${positions.length}`} className="mt-4">
+        {positions.length === 0 && (
+          <p className="py-4 text-[13px] text-[var(--mute)]">
+            {isConnected ? 'No outcome shares on this wallet yet.' : 'Connect to see open windows.'}
+          </p>
         )}
-        {events.map((event) => (
-          <li key={event.id} className="py-4 border-b border-[var(--line)] text-[13px]">
-            <p className="text-[var(--ink)]">{event.title}</p>
-            {event.detail && <p className="text-[var(--mute)] mt-1">{event.detail}</p>}
-          </li>
-        ))}
-      </ol>
+        <ul>
+          {positions.map((pos) => (
+            <li key={`${pos.marketId}-${pos.outcomeIdx}`} className="py-4 border-t border-[var(--line)] first:border-t-0 text-[13px]">
+              <div className="flex items-baseline justify-between gap-4">
+                <p className="text-[var(--ink)]">
+                  {pos.asset} {pos.interval} · {pos.side === 'up' ? 'Up' : 'Down'}
+                </p>
+                <p className="text-[var(--mute)]">
+                  {pos.amountLabel} {pos.claimable ? ' · claimable' : ` · ${pos.status.toLowerCase()}`}
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </Frame>
+
+      <Frame label="LEDGER" meta={ledger.length ? `${ledger.length}` : 'empty'} className="mt-4">
+        <ol>
+          {ledger.length === 0 && (
+            <li className="py-4 text-[13px] text-[var(--mute)]">Follow or fade a window. Fills land here.</li>
+          )}
+          {ledger.map((row) => (
+            <li key={fillKey(row)} className="py-4 border-t border-[var(--line)] first:border-t-0 text-[13px]">
+              <p className="text-[var(--ink)]">{row.title}</p>
+              {row.detail && <p className="text-[var(--mute)] mt-1">{row.detail}</p>}
+              {row.txHash && (
+                <a
+                  href={explorerTx(net.blockExplorer, row.txHash)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[var(--brass)] mt-1 inline-block"
+                >
+                  {row.txHash.slice(0, 10)}…
+                </a>
+              )}
+            </li>
+          ))}
+        </ol>
       </Frame>
     </div>
   )

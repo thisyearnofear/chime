@@ -71,7 +71,3 @@ export function sizeForPersonality(label: string, defaultSize: number): number {
   const raw = defaultSize * (bias?.sizeMultiplier ?? 1)
   return Math.max(0.001, Math.round(raw * 1000) / 1000)
 }
-
-export function personalityVoice(label: string): string {
-  return getPersonality(label).value
-}

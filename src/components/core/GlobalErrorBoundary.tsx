@@ -9,16 +9,11 @@ interface ErrorBoundaryState {
   error: Error | null
 }
 
-interface GlobalErrorBoundaryProps {
-  children: ReactNode
-  fallback?: (error: Error, errorInfo: ErrorInfo, retry: () => void) => ReactNode
-  onError?: (error: Error, errorInfo: ErrorInfo) => void
-  enableRecovery?: boolean
-  showErrorDetails?: boolean
-}
-
-export class GlobalErrorBoundary extends Component<GlobalErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: GlobalErrorBoundaryProps) {
+export class GlobalErrorBoundary extends Component<
+  { children: ReactNode; showErrorDetails?: boolean },
+  ErrorBoundaryState
+> {
+  constructor(props: { children: ReactNode; showErrorDetails?: boolean }) {
     super(props)
     this.state = { hasError: false, error: null }
   }
@@ -29,7 +24,6 @@ export class GlobalErrorBoundary extends Component<GlobalErrorBoundaryProps, Err
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     console.error('[ErrorBoundary]', error, errorInfo)
-    this.props.onError?.(error, errorInfo)
   }
 
   retry = (): void => {
@@ -38,17 +32,12 @@ export class GlobalErrorBoundary extends Component<GlobalErrorBoundaryProps, Err
 
   render(): ReactNode {
     if (this.state.hasError && this.state.error) {
-      if (this.props.fallback) {
-        return this.props.fallback(this.state.error, { componentStack: '' }, this.retry)
-      }
       return (
         <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--paper)] text-[var(--ink)]">
           <div className="max-w-md w-full">
             <p className="font-display text-4xl">CHIME</p>
             <h1 className="mt-6 text-[15px]">Something broke on the floor.</h1>
-            <p className="mt-2 text-[13px] text-[var(--mute)]">
-              Retry, or go back to the live window.
-            </p>
+            <p className="mt-2 text-[13px] text-[var(--mute)]">Retry, or go back to the live window.</p>
             {this.props.showErrorDetails && (
               <p className="mt-4 text-[12px] text-[var(--halt)] break-all">{this.state.error.message}</p>
             )}
