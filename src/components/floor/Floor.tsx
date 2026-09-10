@@ -12,6 +12,7 @@ import { SeriesSwitcher } from './SeriesSwitcher'
 import { ChimeCard } from './ChimeCard'
 import { ChimeLanding } from './ChimeLanding'
 import { TensionShare } from './TensionShare'
+import { WindowStory } from './WindowStory'
 import { Frame } from '@/components/ui/Frame'
 import { Page } from '@/components/layout/Page'
 import { useLiveWindow } from '@/hooks/useLiveWindow'
@@ -46,6 +47,9 @@ export function Floor() {
       ? -1                 // legacy ?chime=1 (no pct encoded)
       : null               // not a chime deep-link
 
+  // ?ride=Label — pre-select allegiance from a Roster share link
+  const rideParam = params.get('ride')
+
   const { window, loading, usingDemo } = useLiveWindow(series)
   const { decision } = useWindowAgents(window)
   const allegiance = useAgentStore((s) => s.allegiance)
@@ -72,9 +76,14 @@ export function Floor() {
   useEffect(() => {
     const saved = localStorage.getItem('chime:allegiance')
     const size = Number(localStorage.getItem('chime:size'))
-    if (saved) setAllegiance(getPersonality(saved).label)
+    // ?ride= deep-link takes priority over saved allegiance
+    if (rideParam) {
+      setAllegiance(getPersonality(rideParam).label)
+    } else if (saved) {
+      setAllegiance(getPersonality(saved).label)
+    }
     if (Number.isFinite(size) && size > 0) setDefaultSize(size)
-  }, [setAllegiance, setDefaultSize])
+  }, [rideParam, setAllegiance, setDefaultSize])
 
   const handleChime = useCallback(
     (finalUp: number) => {
@@ -194,6 +203,7 @@ export function Floor() {
 
             <div className="mt-3">
               <DebateTicker seats={decision?.seats} />
+              <WindowStory mids={mids} />
               <ImpliedSpark mids={mids} window={window} />
               <ProbabilityRail window={window} />
             </div>
@@ -228,6 +238,8 @@ export function Floor() {
             allegiance={allegiance}
             onPick={setAllegiance}
             action={<FollowFadeBar />}
+            upPct={upPct}
+            secondsLeft={left}
           />
         </Frame>
       </div>

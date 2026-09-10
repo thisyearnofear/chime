@@ -42,16 +42,22 @@ This plan closes the UX / ecosystem / demo gaps without breaking `design.md`.
 - [ ] 11. Demo video script (2:30): clock → seat tap → Follow → fill toast →
       Desk chain seat → Watch closer → bell → Chime-In cascade → ChimeCard
       → Post on X → Roster ride → faucet → roadmap.
+      **First 15 seconds:** Open on a live window, clock ticking, pit seats
+      showing live commentary ("71¢. Market agrees. Book confirmation.").
+      Voice over: "Chime is the only prediction market where the close is a
+      social moment." Let the bell ring on camera.
 - [ ] 12. Verify: `npm run lint`, `npx tsc --noEmit`, `npm run build`.
 - [ ] 13. Submit: testnet prototype + repo + video.
-      **Attach `docs/SDK_FEEDBACK.md` explicitly** as the optional bonus —
-      the brief calls it out and fewer than 5% of teams will include it.
-      Frame it in the submission notes as: "We filed a one-page SDK feedback
+      **Submission notes (copy-paste):**
+      "Chime is the only prediction market where the close is a social
+      moment. When the bell rings, the implied probability resolves into an
+      animated cascade, a shareable Chime Card appears with the final result
+      and voice count, and one tap posts a pre-filled tweet that deep-links
+      back to the next live window. We also filed a one-page SDK feedback
       report covering indexer lag, fill-by-tx gaps, silent empty books,
-      faucet discoverability, status-int mapping, and venue-rotation docs.
-      See `docs/SDK_FEEDBACK.md` in the repo."
-      This signals production-grade thinking to technical judges and
-      directly addresses the ecosystem-impact criterion.
+      faucet discoverability, status-int mapping, and venue-rotation docs —
+      see docs/SDK_FEEDBACK.md in the repo."
+      Attach `docs/SDK_FEEDBACK.md` explicitly as the optional bonus.
 
 ## Log
 
@@ -60,7 +66,8 @@ This plan closes the UX / ecosystem / demo gaps without breaking `design.md`.
   works label (2), Watch closer board (3), Desk share-fill (4), Roster
   leaderboard + Ride (5), demo-safe simulated fills (6). P1 shipped — bell
   flash (7), tape persistence (8), nav label (9, inside 2), SDK feedback (10).
-- 2026-09-10: Chime-In Effect shipped — close cascade (WindowClock.tsx),
-  ChimeCard with voices count (ChimeCard.tsx, useVoices.ts), wired into
-  Floor.tsx. Tweet intent URL + ?chime= deep-link added to ChimeCard.
-  Submission notes updated to call out SDK_FEEDBACK.md explicitly.
+- 2026-09-10: Differentiation pass — dynamic seat lines (dynamicLine() in
+  personality-presets, wired into AgentPit), window story line
+  (WindowStory.tsx above ImpliedSpark), Roster share + ?ride= deep-link
+  (ShareRide component, Floor reads rideParam on mount), submission
+  sentence + first-15s video hook added to WIN_PLAN item 11/13.

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { PERSONALITY_PRESETS } from '@/lib/personality-presets'
 import { useAgentStore } from '@/stores/agentStore'
@@ -11,6 +11,38 @@ import type { RosterRow } from '@/types/markets'
 function winRate(row: RosterRow): number {
   const decided = row.wins + row.losses
   return decided === 0 ? 0 : row.wins / decided
+}
+
+function ShareRide({ label, pct }: { label: string; pct: number }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleShare = useCallback(() => {
+    const origin = typeof window !== 'undefined' ? globalThis.location.origin : 'https://chime.floor'
+    const rideUrl = `${origin}/?ride=${encodeURIComponent(label)}`
+    const text = [
+      `I'm riding ${label} · ${pct}% win rate`,
+      `Follow the leader on Chime`,
+      `#ChimeIn`,
+      rideUrl,
+    ].join(' · ')
+    const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
+    globalThis.open(intentUrl, '_blank', 'noopener,noreferrer,width=600,height=500')
+    void navigator.clipboard?.writeText(rideUrl).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }, [label, pct])
+
+  return (
+    <button
+      type="button"
+      onClick={handleShare}
+      className="text-[11px] text-[var(--mute)] hover:text-[var(--brass)] transition-colors"
+      title={`Share ${label}`}
+    >
+      {copied ? 'copied ✓' : '↗ share'}
+    </button>
+  )
 }
 
 export default function RosterPage() {
@@ -88,6 +120,7 @@ export default function RosterPage() {
               <div className="mt-2 flex items-center justify-between gap-4">
                 <p className="text-[12px] text-[var(--mute)]">{p.tagline} · {pct}%</p>
                 <span className="flex items-center gap-3">
+                  <ShareRide label={p.label} pct={pct} />
                   {ridingThis ? (
                     <Link href="/" className="text-[12px] text-[var(--brass)] hover:underline">
                       Floor →
@@ -98,7 +131,7 @@ export default function RosterPage() {
                       onClick={() => ride(p.label)}
                       className="text-[12px] text-[var(--mute)] hover:text-[var(--brass)]"
                     >
-                      {riding === p.label ? 'riding' : 'Ride'}
+                      {riding === p.label ? 'riding ✓' : 'Ride'}
                     </button>
                   )}
                 </span>

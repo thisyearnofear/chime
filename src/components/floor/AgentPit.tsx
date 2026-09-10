@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { formatSide } from '@/lib/markets/format'
+import { dynamicLine } from '@/lib/personality-presets'
 import { PitTape } from './PitTape'
 import { usePositionStore } from '@/stores/positionStore'
 import type { AgentSeat } from '@/types/markets'
@@ -12,11 +13,17 @@ export function AgentPit({
   allegiance,
   onPick,
   action,
+  upPct = 50,
+  secondsLeft = 900,
 }: {
   seats: [AgentSeat, AgentSeat] | undefined
   allegiance: string
   onPick?: (label: string) => void
   action?: ReactNode
+  /** Current implied-Up probability 0–100 */
+  upPct?: number
+  /** Seconds remaining in the window */
+  secondsLeft?: number
 }) {
   const events = usePositionStore((s) => s.events)
   const stake = events.find((e) => e.type === 'follow' || e.type === 'fade')
@@ -33,6 +40,8 @@ export function AgentPit({
       {seats.map((seat, index) => {
         const followed = seat.label === allegiance
         const n = String(index + 1).padStart(2, '0')
+        // Override the static LLM line with a live context-aware one
+        const liveLine = dynamicLine(seat.label, seat.side, upPct, secondsLeft)
         return (
           <article key={seat.label} className="border-t border-[var(--line)] first:border-t-0 py-5 first:pt-0">
             <button
@@ -59,7 +68,7 @@ export function AgentPit({
                 </span>
               </div>
               <p className="mt-2 text-[13px] text-[var(--mute)] leading-relaxed">
-                {seat.line.replace(/^[\p{Extended_Pictographic}\uFE0F]+\s*/u, '')}
+                {liveLine}
               </p>
               {followed && stake?.side ? (
                 <p className="mt-2 text-[12px] text-[var(--brass)]">
