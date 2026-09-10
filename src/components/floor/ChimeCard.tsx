@@ -14,8 +14,24 @@ interface ChimeCardProps {
 }
 
 /**
+ * Builds a ?chime= deep-link that drops the recipient onto the exact window
+ * that just closed: /?asset=BTC&window=15m&chime=1
+ * The `chime=1` param is a hint to the Floor to highlight the closed state.
+ */
+function buildChimeUrl(win: LiveWindow): string {
+  const origin = typeof window !== 'undefined' ? globalThis.location.origin : 'https://chime.floor'
+  const params = new URLSearchParams({
+    asset: win.asset,
+    window: formatInterval(win.intervalSec),
+    chime: '1',
+  })
+  return `${origin}/?${params.toString()}`
+}
+
+/**
  * Pure SVG snapshot shown after a window closes.
- * Generates a shareable tweet text and copies it to clipboard.
+ * "Share your call" opens a pre-filled Twitter/X intent in a new tab.
+ * Also copies the tweet text to clipboard as a fallback.
  * No new colors — uses the existing CSS custom properties.
  */
 export function ChimeCard({ window: win, finalUp, voices, userSide, userWon, onDismiss }: ChimeCardProps) {
@@ -37,22 +53,31 @@ export function ChimeCard({ window: win, finalUp, voices, userSide, userWon, onD
     : null
 
   const voiceLabel = voices === 1 ? '1 voice chimed in' : `${voices} voices chimed in`
-  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://chime.floor'
 
+  // Deep-link URL: lands on the exact closed window
+  const chimeUrl = buildChimeUrl(win)
+
+  // Tweet text — URL goes at the end so Twitter's t.co shortener wraps it
   const tweetText = [
     `${cadence} closed at ↑${upPct}¢`,
     outcome ?? voiceLabel,
     `#ChimeIn`,
-    baseUrl,
+    chimeUrl,
   ].join(' · ')
 
+  // Twitter/X intent URL
+  const tweetIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`
+
   const handleShare = useCallback(() => {
+    // Open the pre-filled tweet composer in a new tab
+    globalThis.open(tweetIntentUrl, '_blank', 'noopener,noreferrer,width=600,height=500')
+    // Also copy to clipboard as a fallback for non-Twitter sharing
     void navigator.clipboard?.writeText(tweetText).then(() => {
       setCopied(true)
       if (timerRef.current) clearTimeout(timerRef.current)
       timerRef.current = setTimeout(() => setCopied(false), 2500)
     })
-  }, [tweetText])
+  }, [tweetIntentUrl, tweetText])
 
   // SVG card dimensions
   const W = 400
@@ -210,16 +235,18 @@ export function ChimeCard({ window: win, finalUp, voices, userSide, userWon, onD
 
       {/* Action bar */}
       <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-[var(--line)]">
-        <button
-          type="button"
-          onClick={handleShare}
-          className="h-9 px-4 text-[12px] bg-[var(--brass)] text-[var(--paper)] hover:brightness-110 transition-[filter]"
-        >
-          {copied ? 'copied ✓' : 'Share your call'}
-        </button>
-        <p className="text-[11px] text-[var(--mute)] flex-1 truncate hidden sm:block">
-          {tweetText}
-        </p>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleShare}
+            className="h-9 px-4 text-[12px] bg-[var(--brass)] text-[var(--paper)] hover:brightness-110 transition-[filter]"
+          >
+            Post on X
+          </button>
+          <span className="text-[11px] text-[var(--mute)]">
+            {copied ? 'link copied ✓' : '· copies link too'}
+          </span>
+        </div>
         {onDismiss && (
           <button
             type="button"
