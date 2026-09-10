@@ -1,8 +1,8 @@
 # CHIME
 
-**Agents take a side. You follow or fade. The window decides.**
+**Two seats. One window. Chime in.**
 
-A consumer floor for [DreamDEX Event Contracts](https://docs.dreamdex.io/developers/event-contracts) on Somnia. Two personality agents must disagree on the live BTC or ETH window. Spectate with no wallet. Follow or fade with one IOC.
+A consumer floor for [DreamDEX Event Contracts](https://docs.dreamdex.io/developers/event-contracts) on Somnia. Two personality agents must disagree on the live BTC or ETH window. Chime in free with a take, or follow/fade with one IOC.
 
 - Repo: [thisyearnofear/chime](https://github.com/thisyearnofear/chime)
 - Production: [usechime.netlify.app](https://usechime.netlify.app)
@@ -12,9 +12,10 @@ Visual lock: [`design.md`](design.md). Agent lock: [`.cursor/skills/chime-floor/
 ## Loops
 
 1. **Spectate** — `/` is the live clock and two seats.
-2. **Follow / Fade** — More → Setup sets allegiance and size. Testnet faucet lives there.
-3. **Claim** — More → Desk redeems Finalized shares. Roster is paper W/L.
-4. **Look it up** — More → Glossary explains windows, seats, cents, and the spark.
+2. **Chime in** — `Chime Up` / `Chime Down` is a free public take: no wallet, two-tone ping, lands on the tape, joins the chorus rail (crowd vs book).
+3. **Follow / Fade** — Setup sets allegiance and size. Testnet faucet lives there.
+4. **Claim** — Desk redeems Finalized shares. Roster is paper W/L with Ride.
+5. **Look it up** — More → How it works explains chimes, chorus, windows, seats, cents, and the spark.
 
 ## Stack
 

@@ -64,11 +64,30 @@ chain-visible before the indexer caught up. The 15:15Z window finalized Down
 against a YES ticket, so `redeemHeld` correctly paid 0. A winning payout tx
 is still unproven.
 
+## Loop 0 — Chime in (free voice, the signature)
+
+Goal: a spectator with no wallet registers a public take in one tap. Voice
+before money — the verb the brand owns.
+
+| Surface | File |
+| --- | --- |
+| Chime Up / Down (ghost taps) | `src/components/floor/FollowFadeBar.tsx` |
+| Two-tone ping (523→784, ~0.5s) | `src/lib/chime-sound.ts` → `playChimeIn` (bell stays the deep 3-partial `playClosingBell`) |
+| Chorus state (one per side per window, 200 cap, 24h TTL) | `src/stores/chorusStore.ts` (`localStorage: chime:chimes`), `chorusFor()`, `chorusRank()` (Unison/Octave/Carillon) |
+| Chorus rail (pewter N Up · M Down + lean) | `src/components/floor/ProbabilityRail.tsx` |
+| Chimed rows on tape | `src/components/floor/PitTape.tsx` (`kind: 'chime'`) |
+| Voices count includes chimes | `src/hooks/useVoices.ts` |
+| Glossary (Chime, Chorus, ranks) | `src/app/help/page.tsx` |
+
+Hero copy is *Two seats. One window. Chime in.* Crowd-vs-book divergence
+(chorus 80% Up vs book 52¢) is the tension no order-book clone has.
+
 ## Stores
 
 - `useMarketStore` — series, current `LiveWindow`, catalog, last 40 mids (`withBookSample`), tape prints.
 - `useAgentStore` — current `WindowDecision`, allegiance (`localStorage: chime:allegiance`), default size (`localStorage: chime:size`).
 - `usePositionStore` — `TimelineEvent[]` per wallet (`localStorage: chime:events:<address>`), last tx hash, pending flag.
+- `useChorusStore` — free-voice `ChimeEntry[]` (`localStorage: chime:chimes`), one per side per window, 24h TTL.
 
 ## API routes
 

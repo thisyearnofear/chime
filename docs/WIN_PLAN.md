@@ -71,3 +71,6 @@ This plan closes the UX / ecosystem / demo gaps without breaking `design.md`.
   (WindowStory.tsx above ImpliedSpark), Roster share + ?ride= deep-link
   (ShareRide component, Floor reads rideParam on mount), submission
   sentence + first-15s video hook added to WIN_PLAN item 11/13.
+- 2026-09-10: Chime In signature shipped — free voice before money
+  (chorusStore, playChimeIn, chorus rail, tape rows, hero copy).
+  README / implementation.md / CHANGELOG updated to the ritual.

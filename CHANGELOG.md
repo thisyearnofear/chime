@@ -2,6 +2,30 @@
 
 Working log of shipped changes. Dates in YYYY-MM-DD.
 
+## 2026-09-10 — Chime In: free voice before money (the signature)
+
+The memorable mechanic: spectators register a public take with no wallet.
+Voice before money — the verb the brand owns.
+
+- **Chime Up / Down** (`FollowFadeBar.tsx`, ghost taps) — free, no wallet,
+  disabled unless the window is Trading. One chime per side per window per
+  browser (`chorusStore.ts`, `localStorage: chime:chimes`, 200 cap, 24h TTL).
+- **Two-tone ping** (`chime-sound.ts` → `playChimeIn`, 523→784, ~0.5s) —
+  distinct from the deep three-partial closing bell. Audio brand, zero pixels.
+- **Chorus rail** (`ProbabilityRail.tsx`) — pewter 1px line under the book:
+  `chorus N Up · M Down` + lean (`crowd leans Up / Down / split` at 60/40).
+  Crowd-vs-book divergence is the tension.
+- **Tape + voices** (`PitTape.tsx`, `useVoices.ts`) — `Chimed Up/Down` rows,
+  window-scoped; voices count includes chimes.
+- **Words** — hero is *Two seats. One window. Chime in.* Glossary gains
+  Chime, Chorus, Unison · Octave · Carillon (streak ranks, words not points).
+  `design.md` + chime-floor skill locked to the ritual.
+- **Demo clip** — Chime Up → ping → tape → chorus vs book → bell → card →
+  Post on X. Filmable with no wallet.
+
+Validation: `npm run lint` clean, `npx tsc --noEmit` exit 0, `next build`
+12/12.
+
 ## 2026-09-10 — Live loop proof on Shannon testnet
 
 Proved all three loops against the live DreamDEX venue (`0x679795a0…`) with
