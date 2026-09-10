@@ -59,7 +59,7 @@ export interface MidSample {
 export interface TapeRow {
   id: string
   at: number
-  kind: 'print' | 'follow' | 'fade'
+  kind: 'print' | 'follow' | 'fade' | 'chime'
   text: string
   side?: Side
 }

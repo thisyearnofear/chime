@@ -1,14 +1,16 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useMarketStore } from '@/stores/marketStore'
 import { usePositionStore } from '@/stores/positionStore'
+import { chorusFor, useChorusStore } from '@/stores/chorusStore'
 
 /**
- * Returns the count of distinct "voices" (Follow/Fade participants) for the
- * current floor window. Counts:
+ * Returns the count of distinct "voices" (Follow/Fade participants + free
+ * chimes) for the current floor window. Counts:
  *   - Each follow/fade event in positionStore (the user's own trades)
  *   - Each follow/fade print in the pit tape (market activity prints)
+ *   - Each free chime in chorusStore for this window
  *
  * Deduped by event id so reloads don't double-count.
  * Returns 0 if no window is active.
@@ -17,6 +19,12 @@ export function useVoices(): number {
   const tape = useMarketStore((s) => s.tape)
   const events = usePositionStore((s) => s.events)
   const window = useMarketStore((s) => s.window)
+  const chimes = useChorusStore((s) => s.chimes)
+  const hydrateChorus = useChorusStore((s) => s.hydrate)
+
+  useEffect(() => {
+    hydrateChorus()
+  }, [hydrateChorus])
 
   return useMemo(() => {
     if (!window) return 0
@@ -25,7 +33,7 @@ export function useVoices(): number {
 
     // Count follow/fade prints from the pit tape (one per unique id)
     for (const row of tape) {
-      if (row.kind === 'follow' || row.kind === 'fade') {
+      if (row.kind === 'follow' || row.kind === 'fade' || row.kind === 'chime') {
         seen.add(row.id)
       }
     }
@@ -40,8 +48,12 @@ export function useVoices(): number {
       }
     }
 
+    // Count free chimes for this window
+    const { total } = chorusFor(window.marketId, chimes)
+    for (let i = 0; i < total; i += 1) seen.add(`chime-${window.marketId}-${i}`)
+
     // Always count at least 1 when there is an active book (implies market makers)
     const base = window.bestBid != null || window.bestAsk != null ? 1 : 0
     return Math.max(base, seen.size)
-  }, [tape, events, window])
+  }, [tape, events, window, chimes])
 }

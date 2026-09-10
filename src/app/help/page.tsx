@@ -5,6 +5,14 @@ import { Page, PageHead } from '@/components/layout/Page'
 
 const ENTRIES: Array<{ term: string; def: string }> = [
   {
+    term: 'Chime',
+    def: 'A free public take — Up or Down, no wallet, no stake. One tap rings a two-tone chime, lands on the tape, and joins the chorus. Follow backs a chime with money.',
+  },
+  {
+    term: 'Chorus',
+    def: 'All chimed voices on a window, shown as a pewter rail under the book: N Up · M Down, plus the lean (crowd leans Up / Down / split). Crowd vs book divergence is the tension.',
+  },
+  {
     term: 'Window',
     def: 'A time-bucketed bet on BTC or ETH. Resolves at the timer — Up if the price closes above strike, Down otherwise. The cadence (15m, 1h, 4h, 24h) is the bucket size.',
   },
@@ -46,7 +54,11 @@ const ENTRIES: Array<{ term: string; def: string }> = [
   },
   {
     term: 'Pit tape',
-    def: 'Six rows under seat 02. Mixes mid-price prints (Up X\u00a2) with your follows and fades. Sorted newest first.',
+    def: 'Six rows under seat 02. Mixes mid-price prints with chimes, follows and fades. Sorted newest first.',
+  },
+  {
+    term: 'Unison · Octave · Carillon',
+    def: 'Musical ranks for correct-chime streaks: 2 in a row is Unison, 3 is Octave, 5 is Carillon. Words, not points.',
   },
 ]
 

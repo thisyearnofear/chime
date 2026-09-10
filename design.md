@@ -41,7 +41,9 @@ One accent. Down is pewter, not violet.
 - Each frame has inset rules and brass corner ticks (`--tick` 8px)
 - Clock is a layered instrument: 12 outer ticks (cardinals brass), remaining arc, implied-Up ring, inner numeral well
 - Seats are numbered spec rows (`01` / `02` stay mute)
-- One verbal hero under the clock: *Two seats. One window. Follow or fade.*
+- One verbal hero under the clock: *Two seats. One window. Chime in.*
+- Free voice before money: Chime Up / Down (ghost taps, no wallet) ring the two-tone ping and join the chorus. Follow/Fade stay the staked control.
+- Chorus rail: pewter 1px line under the book rail showing chimed N Up · M Down + lean. Crowd-vs-book divergence is the tension.
 - Floor switcher shows **live windows only**; Watch owns the catalog
 - Hide the book until a bid or ask exists
 - Implied-up sparkline under the clock: last ~40 mids, no axes. Halt stroke in the last 30s

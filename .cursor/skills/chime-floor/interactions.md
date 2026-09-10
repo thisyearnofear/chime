@@ -16,6 +16,10 @@ When remaining hits zero or the window locks after having been open, the clock r
 
 ## 4. Follow / fade
 
-IOC on the followed seat’s side (fade flips it). After a fill, the followed seat reads `you're on Up · 5 tUSDC`. The pit tape logs Follow/Fade and mid prints.
+IOC on the followed seat's side (fade flips it). After a fill, the followed seat reads `you're on Up · 5 tUSDC`. The pit tape logs Follow/Fade and mid prints.
+
+## 5. Chime in (free voice)
+
+Chime Up / Down costs nothing and needs no wallet. One tap plays the two-tone `playChimeIn` ping, writes `chime:chimes` to localStorage, lands a `Chimed Up/Down` row on the tape, and joins the chorus rail. One chime per side per window per browser. The bell stays the deep three-partial `playClosingBell` — never the same sound as a chime.
 
 Success: spectator understands the window without a wallet; one tap still follows or fades.

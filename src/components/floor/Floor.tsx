@@ -191,9 +191,9 @@ export function Floor() {
               )
             )}
 
-            <p className="mt-3 text-[15px] text-[var(--ink)]">Two seats. One window. Follow or fade.</p>
+            <p className="mt-3 text-[15px] text-[var(--ink)]">Two seats. One window. Chime in.</p>
             <p className="mt-1 text-[12px] text-[var(--mute)]">
-              Follow rides the seat · fade takes the other side · winners claim on Desk
+              Chime free for a voice · follow rides the seat · fade takes the other side · winners claim on Desk
             </p>
 
             {/* TensionShare — last 60s of a live window */}

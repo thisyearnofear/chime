@@ -12,9 +12,10 @@ Read `design.md` at the repo root first. Change **one or two variables** per pas
 - Shell: `Page` (`max-w-6xl px-4 py-6 md:py-10`). Frames share `gap-4`, `1px` `--line`, brass L-ticks.
 - Type: Newsreader **wordmark only**. Everything else JetBrains Mono. Labels 11px, tracking normal. No 0.35em eyebrows.
 - Color: `--paper` `#100e0b`, `--ink` `#ece7dc`, `--mute` `#8a8478`, `--line` `#2a261f`, `--brass` `#c4a15a` (Up, Follow, live), `--slate` `#7d847c` (Down, Fade), `--halt` `#c45c4a` (last 30s). One accent.
-- Clock is the instrument: outer ticks, remaining arc, implied-Up ring, numeral well. Sparkline under the clock, no axes. Hide book until bid/ask exists.
-- Pit: two numbered spec rows (`01`/`02` stay mute). Tap seat = allegiance. Follow/Fade is a separate control under the followed seat (mobile: under the clock).
-- Tape: ≤6 prints/follows under seat 02.
+- Spectate — Clock is the hero. Spectators read the window, the implied-Up spark, and the pit tape.
+- Chime — free voice, no wallet. One tap on Chime Up / Down rings the two-tone ping, lands on the tape, joins the chorus.
+- Follow/Fade — money. Under the followed seat (desktop) or clock (mobile). IOC sized from Setup.
+- Chorus — pewter rail under the book: N Up · M Down + lean (crowd leans Up / Down / split). Crowd-vs-book divergence is the tension.
 - Motion: clock tick, one CHIME scale pulse. Respect `prefers-reduced-motion`.
 
 ## Do not ship
