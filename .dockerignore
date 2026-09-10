@@ -1,0 +1,9 @@
+# CHIME build context: source + lockfile only (never .env.local, .data, .next).
+node_modules
+.next
+.data
+.git
+.env*
+!.env.example
+*.log
+.DS_Store
