@@ -2,6 +2,21 @@
 
 Working log of shipped changes. Dates in YYYY-MM-DD.
 
+## 2026-09-10 — Shared chorus: the crowd is real + opposed-sides money shot
+
+- **`/api/chorus`** (`route.ts` + `lib/chorus/server.ts`) — shared tally per
+  market in `.data/chime-chorus.json` (200 markets, 24h TTL). Every free
+  chime POSTs server-side; rail + voices read `mergedChorus` (shared wins,
+  local fallback, 8s poll). Verified live: up 2 / down 1 round-trips.
+- **Opposed-sides prover** — YES leg 2 @ 0.503 (`e2c27906…`), NO leg 2 @
+  0.566 (`efff5c35…`) on the ETH 24h window exp 2026-09-11T00:00Z
+  (`0x…188ec`). Chain holds `YES=2000000 NO=2000000` — one side MUST win.
+  Watcher polling to settlement, redeems the winner on the bell. The money
+  shot for the demo video.
+- **Demo clip script** (`scripts/demo-clip.mjs`, 7 steps) — the 30-second
+  judge sequence with no wallet: chime → chorus vs book → countdown → bell
+  → card → Post on X. Verified against the live chorus API.
+
 ## 2026-09-10 — Chime In: free voice before money (the signature)
 
 The memorable mechanic: spectators register a public take with no wallet.

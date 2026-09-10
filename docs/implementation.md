@@ -74,6 +74,7 @@ before money — the verb the brand owns.
 | Chime Up / Down (ghost taps) | `src/components/floor/FollowFadeBar.tsx` |
 | Two-tone ping (523→784, ~0.5s) | `src/lib/chime-sound.ts` → `playChimeIn` (bell stays the deep 3-partial `playClosingBell`) |
 | Chorus state (one per side per window, 200 cap, 24h TTL) | `src/stores/chorusStore.ts` (`localStorage: chime:chimes`), `chorusFor()`, `chorusRank()` (Unison/Octave/Carillon) |
+| Shared crowd aggregate (all browsers) | `src/app/api/chorus/route.ts` + `src/lib/chorus/server.ts` (`.data/chime-chorus.json`, 200 markets, 24h TTL). Rail + voices read `mergedChorus` (shared wins, local fallback, 8s poll) |
 | Chorus rail (pewter N Up · M Down + lean) | `src/components/floor/ProbabilityRail.tsx` |
 | Chimed rows on tape | `src/components/floor/PitTape.tsx` (`kind: 'chime'`) |
 | Voices count includes chimes | `src/hooks/useVoices.ts` |
@@ -97,6 +98,8 @@ Hero copy is *Two seats. One window. Chime in.* Crowd-vs-book divergence
 | `GET  /api/agents/window?marketId=…` | Cached seat decision (LLaMA-free fast path). |
 | `POST /api/agents/window` | Generate (or replay) a seat decision. |
 | `GET  /api/agents/roster` | Wins/losses/pushes per personality from cached decisions × indexer resolutions. |
+| `GET  /api/chorus?marketId=…` | Shared crowd tally (all browsers) for a window: `{ marketId, up, down, updatedAt }`. |
+| `POST /api/chorus` | Register one free chime `{ marketId, side }` → updated tally. |
 
 ## Personality presets
 
@@ -110,6 +113,7 @@ Both caches live under `./.data/` and are git-ignored:
 
 - `chime-live.json` — last successful indexer response (30s in-memory TTL).
 - `chime-decisions.json` — seat decisions, max 200 entries, 24h TTL on read.
+- `chime-chorus.json` — shared crowd tallies per market, max 200 markets, 24h TTL on read.
 
 See [`deployment/README.md`](../deployment/README.md) for env vars and Netlify build settings.
 
