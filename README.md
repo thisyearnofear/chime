@@ -13,9 +13,10 @@ Visual lock: [`design.md`](design.md). Agent lock: [`.cursor/skills/chime-floor/
 
 1. **Spectate** — `/` is the live clock and two seats.
 2. **Chime in** — `Chime Up` / `Chime Down` is a free public take: no wallet, two-tone ping, lands on the tape, joins the chorus rail (crowd vs book).
-3. **Follow / Fade** — Setup sets allegiance and size. Testnet faucet lives there.
-4. **Claim** — Desk redeems Finalized shares. Roster is paper W/L with Ride.
-5. **Look it up** — More → How it works explains chimes, chorus, windows, seats, cents, and the spark.
+3. **Follow / Fade** — Setup sets allegiance and size. Testnet faucet lives there. `?demo=1` runs a simulated book for judges with no wallet.
+4. **Claim** — Desk redeems Finalized shares. Roster is paper W/L with Ride + `↗ share` (`?ride=` deep-link drops a friend into your seat).
+5. **Close is a social moment** — the bell sweeps the ring to the final `↑NN¢`, a Chime Card appears with voices + Post on X (`?chime=NN` deep-link back), and the last-60s TensionShare lets spectators post the tension before the result.
+6. **Look it up** — More → How it works explains chimes, chorus, windows, seats, cents, and the spark.
 
 ## Stack
 

@@ -117,5 +117,10 @@ This plan closes the UX / ecosystem / demo gaps without breaking `design.md`.
   Roster share + `?ride=` deep-link (items 14–16).
 - 2026-09-10: P4 differentiation shipped — dynamic seat lines
   (dynamicLine()), WindowStory, submission sentence (items 17–19).
+- 2026-09-10: docs catch-up — CHANGELOG gains P0+P1 (b0203a9) and P2–P4
+  (6d25dbf/02b033a/cb72f2e/687f024) entries; implementation.md maps
+  ChimeCard/ChimeLanding/TensionShare/WindowStory/dynamicLine/?ride=/Watch/
+  Roster-share/Demo-mode; README loops cover demo mode, ?ride= share, and
+  the close-as-social-moment.
 - Remaining: demo video, winning claim on camera, Bot Kit agent,
   final verify, submit.

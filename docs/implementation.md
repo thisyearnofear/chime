@@ -18,9 +18,14 @@ Goal: a spectator with no wallet sees the live window, the two seats, and the im
 | Implied-up ring + cents | `src/components/floor/ProbabilityRail.tsx` |
 | Sparkline (~40 mids) | `src/components/floor/ImpliedSpark.tsx` |
 | Live-window switcher | `src/components/floor/SeriesSwitcher.tsx` |
-| Seat rows (01 / 02) | `src/components/floor/AgentPit.tsx` |
-| Pit tape (≤6) | `src/components/floor/PitTape.tsx` |
+| Seat rows (01 / 02, live lines) | `src/components/floor/AgentPit.tsx` → `dynamicLine()` in `src/lib/personality-presets.ts` |
+| Pit tape (≤6, persists) | `src/components/floor/PitTape.tsx` ← `useMarketStore` (`localStorage: chime:tape`) |
 | One quote line | `src/components/floor/DebateTicker.tsx` |
+| Window story (opened · high · now) | `src/components/floor/WindowStory.tsx` (hidden until 2+ mids, spread ≥ 3¢) |
+| Close cascade (↑NN¢ sweep → CHIME) | `src/components/floor/WindowClock.tsx` (`onChime`, 2s sweep, `prefers-reduced-motion` safe) |
+| Shareable result card | `src/components/floor/ChimeCard.tsx` (SVG snapshot, voices, `?chime=NN` deep-link, Post on X) |
+| Deep-link landing banner | `src/components/floor/ChimeLanding.tsx` (closed result + next-open countdown) |
+| Pre-close share button | `src/components/floor/TensionShare.tsx` (last 60s, 15s < left ≤ 60s) |
 | Frame + corner ticks | `src/components/ui/Frame.tsx` |
 | Book + status fetch | `src/hooks/useLiveWindow.ts` → `src/lib/markets/windows.ts` |
 | Seat copy (LLM or heuristic) | `src/hooks/useWindowAgents.ts` → `src/lib/agents/decide.ts` |
@@ -34,6 +39,7 @@ Goal: with one tap, take the followed seat's side or fade it. The order is an IO
 | Surface | File |
 | --- | --- |
 | Allegiance picker (one row tap) | `src/components/floor/AgentPit.tsx` |
+| `?ride=Label` deep-link pre-select | `src/components/floor/Floor.tsx` reads `rideParam` → `getPersonality().label` (priority over `localStorage`) |
 | Follow/Fade control | `src/components/floor/FollowFadeBar.tsx` |
 | Trade executor | `src/hooks/useFollowTrade.tsx` |
 | IOC placement | `src/lib/markets/trade.ts` → `placeFollowOrder` |
@@ -51,7 +57,7 @@ Goal: when a window finalizes, redeem held outcome shares on chain.
 
 | Surface | File |
 | --- | --- |
-| Claim button + positions + ledger | `src/app/dashboard/page.tsx` |
+| Claim button + positions + ledger + ShareFill | `src/app/dashboard/page.tsx` |
 | Loader | `src/hooks/useDesk.ts` |
 | On-chain + indexer merge | `src/lib/markets/desk.ts` |
 | Redeemer | `src/lib/markets/trade.ts` → `redeemWinnings` |
@@ -77,7 +83,10 @@ before money — the verb the brand owns.
 | Shared crowd aggregate (all browsers) | `src/app/api/chorus/route.ts` + `src/lib/chorus/server.ts` (`.data/chime-chorus.json`, 200 markets, 24h TTL). Rail + voices read `mergedChorus` (shared wins, local fallback, 8s poll) |
 | Chorus rail (pewter N Up · M Down + lean) | `src/components/floor/ProbabilityRail.tsx` |
 | Chimed rows on tape | `src/components/floor/PitTape.tsx` (`kind: 'chime'`) |
-| Voices count includes chimes | `src/hooks/useVoices.ts` |
+| Voices count includes chimes | `src/hooks/useVoices.ts` (tape + own events + merged shared chorus; ≥3 renders tappable join-them CTA) |
+| Roster leaderboard + Ride + share | `src/app/roster/page.tsx` (win-rate bars, pending, Ride → allegiance; `↗ share` tweets win rate + `?ride=` URL) |
+| Watch closer board | `src/app/watch/page.tsx` (sorted by expiry, `left` countdown + `Up NN¢`, halt styling <30s) |
+| Demo-safe mode | `src/lib/demo-data.ts` + `?demo=1` — fake book; Follow simulates fill + Desk entry, labelled DEMO |
 | Glossary (Chime, Chorus, ranks) | `src/app/help/page.tsx` |
 
 Hero copy is *Two seats. One window. Chime in.* Crowd-vs-book divergence
@@ -104,6 +113,8 @@ Hero copy is *Two seats. One window. Chime in.* Crowd-vs-book divergence
 ## Personality presets
 
 Six voices in `src/lib/personality-presets.ts`: Disciplined, Encouraging, Competitive, Philosophical, Taker, Patient. Each carries a `value` system prompt and a seat emoji (⚡ 🌟 🔥 🧠 🏎️ 🧘) rendered in `AgentPit` and on Roster. `getPersonality` accepts legacy aliases (`Aggressive Commuter` → `Taker`, `Zen Walker` → `Patient`).
+
+`dynamicLine(label, side, upPct, secondsLeft)` returns a context-aware one-liner per seat — 6 personalities × 6 state bands (closing ≤30s, last-minute ≤60s, heavy favoured/against at 70/30, neutral 45–55, default). `AgentPit` renders it every tick (`upPct` + `secondsLeft` props from `Floor`), so the pit reads alive as the window moves.
 
 The seat pair is picked deterministically by `seatsForWindow`; the system forces a fade when both seats land on the same side.
 

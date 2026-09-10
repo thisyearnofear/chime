@@ -41,6 +41,78 @@ Voice before money — the verb the brand owns.
 Validation: `npm run lint` clean, `npx tsc --noEmit` exit 0, `next build`
 12/12.
 
+## 2026-09-10 — WIN_PLAN P2–P4: close ceremony, viral loops, differentiation
+
+P2 Chime-In Effect (`6d25dbf`, `02b033a`) — the close is a social moment:
+
+- **Close cascade** (`WindowClock.tsx`, `onChime`) — ring sweeps to final
+  `↑NN¢` for 2s, settles to CHIME. `prefers-reduced-motion` skips the sweep.
+- **ChimeCard** (`ChimeCard.tsx`, `useVoices.ts`) — SVG snapshot 2.2s after
+  the bell: final-probability arc, voices count, user outcome. `Post on X`
+  opens a twitter intent + copies the link as fallback.
+- **`?chime=NN` deep-link** (`ChimeCard.tsx` → `Floor.tsx` →
+  `ChimeLanding.tsx`) — tweet URL encodes the final probability and lands on
+  the exact closed window; the landing banner shows the result + countdown to
+  the next open instead of a tombstone.
+
+P3 viral loops (`cb72f2e`):
+
+- **TensionShare** (`TensionShare.tsx`) — last 60s of a live window
+  (`status === 1`, book present, 15s < left ≤ 60s): `↗ share the tension`
+  opens a pre-filled tweet with live probability + countdown. Drama > receipts.
+- **Voices CTA** (`Floor.tsx`, `useVoices.ts`) — 3+ voices renders a tappable
+  `N traders chimed in — join them` that smooth-scrolls to `#follow-fade`.
+- **Roster share + `?ride=`** (`roster/page.tsx` → `Floor.tsx`) — `↗ share`
+  per agent row tweets win rate + `/?ride=Label` URL; Floor pre-selects that
+  allegiance on arrival (priority over `localStorage`, aliases resolved via
+  `getPersonality`).
+
+P4 differentiation (`687f024`):
+
+- **Dynamic seat lines** (`personality-presets.ts` → `dynamicLine()`,
+  `AgentPit.tsx`) — 6 personalities × 6 state bands (closing ≤30s,
+  last-minute ≤60s, heavy favoured/against, neutral, default). Pit copy
+  updates every tick as the window moves.
+- **WindowStory** (`WindowStory.tsx`) — `opened 45¢ · high 71¢ · now 63¢`
+  above the sparkline; hidden until 2+ mids exist and spread ≥ 3¢. Tweet
+  inbound visitors get context without reading the chart.
+- **Submission sentence locked** (`docs/WIN_PLAN.md` item 13): "Chime is the
+  only prediction market where the close is a social moment." + copy-paste
+  submission note covering cascade, card, tension share, `?ride=`, and
+  `docs/SDK_FEEDBACK.md`.
+
+Validation: `npm run lint` clean, `npx tsc --noEmit` exit 0, `next build`
+12/12 each commit.
+
+## 2026-09-10 — WIN_PLAN P0 + P1: judge-ready floor, closer board, demo mode
+
+`b0203a9` — UX / ecosystem / demo gaps without breaking `design.md`:
+
+- **Floor onboarding rail** (`FollowFadeBar.tsx`, `Floor.tsx`) —
+  `1 Faucet on Setup → 2 Tap a seat → 3 Follow · winners claim on Desk` +
+  brass `Start` → `/setup` when `!isConnected` or no stake.
+- **Desk promoted** (`ShellNav.tsx`, `design.md`, `SKILL.md`) — primary is
+  Floor · Watch · Desk; More holds Setup · Roster · How it works.
+- **Watch closer board** (`watch/page.tsx`) — sorted by expiry, `left`
+  countdown + `Up NN¢` from `impliedUp`, halt styling <30s. One tap picks the
+  closing window.
+- **Desk proof surface** (`dashboard/page.tsx`, `useDesk.ts`) — `Share fill`
+  copy-button per ledger row (floor link + tx).
+- **Roster leaderboard** (`roster/page.tsx`, `api/agents/roster`) — win-rate
+  bars, pending counts, `Ride` sets allegiance + links Floor.
+- **Demo-safe mode** (`demo-data.ts`, `windows.ts`, `useFollowTrade`) —
+  `?demo=1` seeds a fake book; Follow simulates a fill + Desk ledger entry,
+  always labelled DEMO.
+- **Bell flash + tape persistence** (`WindowClock.tsx` `chime-flash`,
+  `marketStore.ts` `chime:tape`) — brass flash on close; last fills per window
+  survive reload.
+- **SDK feedback** (`docs/SDK_FEEDBACK.md`) — 1 page: indexer lag,
+  fill-by-tx gaps, silent empty books, faucet discoverability, status-int
+  mapping, venue-rotation docs. Attached as the optional bonus per the brief.
+
+Validation: `npm run lint` clean, `npx tsc --noEmit` exit 0, `npm run build`
+clean.
+
 ## 2026-09-10 — Live loop proof on Shannon testnet
 
 Proved all three loops against the live DreamDEX venue (`0x679795a0…`) with
