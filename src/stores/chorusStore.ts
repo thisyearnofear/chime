@@ -126,7 +126,7 @@ export function mergedChorus(
   return { ...l, shared: false }
 }
 
-/** Musical rank for a streak of correct chimes — words, not points. */
+/** Musical rank for showing up — distinct windows voiced. Words, not points. */
 export function chorusRank(streak: number): string | null {
   if (streak >= 5) return 'Carillon'
   if (streak >= 3) return 'Octave'

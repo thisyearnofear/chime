@@ -39,25 +39,39 @@ function ShareFill({ txHash }: { txHash?: string }) {
   )
 }
 
-/** One ledger row — summary visible, tx + share behind a tap. */
-function LedgerRow({ row, index }: { row: DeskFill | TimelineEvent; index: number }) {
-  const [open, setOpen] = useState(index === 0)
+/** One ledger row — summary visible, tx + share behind a tap.
+ * Opens the row matching the latest tx by default so indexer catch-up
+ * highlights the fill the user just made; falls back to the first row. */
+function LedgerRow({
+  row,
+  defaultOpen,
+  net,
+}: {
+  row: DeskFill | TimelineEvent
+  defaultOpen: boolean
+  net: { blockExplorer: string }
+}) {
+  // Uncontrolled after mount: user toggles freely. `key={fillKey(row)}` on the
+  // parent re-mounts the row when the ledger re-sorts, so `defaultOpen`
+  // (latest-tx match, else first row) applies to the fresh row.
+  const [open, setOpen] = useState(defaultOpen)
   return (
     <li className="py-4 border-t border-[var(--line)] first:border-t-0 text-[13px]">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
+        aria-label={open ? `Hide fill details: ${row.title}` : `Show fill details: ${row.title}`}
         className="w-full flex items-baseline justify-between gap-4 text-left"
       >
         <span className="text-[var(--ink)]">{row.title}</span>
-        <span className="shrink-0 text-[11px] text-[var(--mute)]">{open ? '–' : '+'}</span>
+        <span aria-hidden className="shrink-0 text-[11px] text-[var(--mute)]">{open ? '–' : '+'}</span>
       </button>
       {row.detail && <p className="text-[var(--mute)] mt-1 text-[12px]">{row.detail}</p>}
       {open && row.txHash && (
-        <span className="mt-2 flex items-center gap-3">
+        <div className="mt-2 flex items-center gap-3">
           <Link
-            href={explorerTx(getMarketNetwork().blockExplorer, row.txHash)}
+            href={explorerTx(net.blockExplorer, row.txHash)}
             target="_blank"
             rel="noreferrer"
             className="text-[var(--brass)] text-[12px] hover:underline"
@@ -65,7 +79,7 @@ function LedgerRow({ row, index }: { row: DeskFill | TimelineEvent; index: numbe
             {row.txHash.slice(0, 10)}…
           </Link>
           <ShareFill txHash={row.txHash} />
-        </span>
+        </div>
       )}
     </li>
   )
@@ -175,7 +189,7 @@ export default function DashboardPage() {
         </div>
       </Frame>
 
-      <Frame label="POSITIONS" meta={loading ? 'reading' : `${positions.length}`}>
+      <Frame label="POSITIONS" meta={loading ? 'reading' : `${positions.length} open`}>
         {positions.length === 0 && (
           <p className="py-4 text-[13px] text-[var(--mute)]">
             {!isConnected
@@ -201,7 +215,7 @@ export default function DashboardPage() {
         </ul>
       </Frame>
 
-      <Frame label="LEDGER" meta={ledger.length ? `${ledger.length} fills · ${claimableCount} claimable` : 'empty'}>
+      <Frame label="LEDGER" meta={ledger.length ? `${ledger.length} fill${ledger.length === 1 ? '' : 's'}${claimableCount > 0 ? ` · ${claimableCount} claimable` : ''}` : 'no fills yet'}>
         <ol>
           {ledger.length === 0 && (
             <li className="py-4 text-[13px] text-[var(--mute)]">
@@ -211,7 +225,16 @@ export default function DashboardPage() {
             </li>
           )}
           {ledger.map((row, i) => (
-            <LedgerRow key={fillKey(row)} row={row} index={i} />
+            <LedgerRow
+              key={fillKey(row)}
+              row={row}
+              net={net}
+              defaultOpen={
+                lastTxHash
+                  ? row.txHash?.toLowerCase() === lastTxHash.toLowerCase()
+                  : i === 0
+              }
+            />
           ))}
         </ol>
       </Frame>

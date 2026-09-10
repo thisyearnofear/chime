@@ -5,7 +5,9 @@ import { formatCountdown, formatInterval, impliedUp, secondsLeft } from '@/lib/m
 import { useMarketStore } from '@/stores/marketStore'
 import type { LiveWindow } from '@/types/markets'
 
-/** Four-dot ritual indicator — observe · chime · stake · claim. Brass = done. */
+/** Four-note ritual indicator — observe · chime · stake · claim. Brass = done.
+ * Lives here (not Floor) so both Floor and future surfaces share one voice.
+ * `observe` is always done: rendering this means the user is looking at the floor. */
 export function RitualDots({
   chimed,
   staked,
@@ -82,10 +84,9 @@ export function ChimeLanding({ window: linkedWindow, finalUpPct, compact }: Chim
     ? `${linkedWindow.asset} ${formatInterval(linkedWindow.intervalSec)}`
     : 'that window'
 
-  // Estimate next open: current expiry + interval (crude but correct for fixed cadences)
-  const nextOpenSec = linkedWindow
-    ? linkedWindow.expiry + linkedWindow.intervalSec
-    : null
+  // Windows are contiguous buckets — the next one opens AT this window's expiry,
+  // not one interval later. Count down to expiry; at ~0 fall through to live.
+  const nextOpenSec = linkedWindow ? linkedWindow.expiry : null
 
   const waitLeft = nextOpenSec ? Math.max(0, nextOpenSec - now / 1000) : null
   const soonestLeft = soonest ? secondsLeft(soonest.expiry) : null

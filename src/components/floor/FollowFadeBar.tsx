@@ -15,7 +15,7 @@ import { sizeForPersonality } from '@/lib/agents/mapping'
 import { formatSide, secondsLeft } from '@/lib/markets/format'
 import { chorusRank } from '@/stores/chorusStore'
 
-export function FollowFadeBar() {
+export function FollowFadeBar({ barId = 'follow-fade' }: { barId?: string }) {
   const { window } = useMarketStore()
   const { defaultSize } = useAgentStore()
   const { trade, pending, followed } = useFollowTrade()
@@ -45,7 +45,7 @@ export function FollowFadeBar() {
   }
 
   return (
-    <div id="follow-fade">
+    <div id={barId}>
       {fresh && (
         <div className="mb-4 border border-[var(--line)] px-3 py-3">
           <p className="text-[12px] text-[var(--ink)]">1 Chime in free → 2 Faucet on Setup → 3 Follow</p>

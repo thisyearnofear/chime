@@ -154,7 +154,10 @@ body > * {
   animation: chime-rise 0.2s ease-out 1;
 }
 
-/* Mobile action bar — Follow/Fade stays thumb-reachable while the floor scrolls */
+/* Mobile action bar — Follow/Fade stays thumb-reachable while the floor scrolls.
+   Sticky only works when the PARENT is the tall scroll container, so the class
+   goes on the outer mobile wrapper in Floor.tsx (whose parent is the tall
+   left column), never on an inner div. */
 @media (max-width: 1023px) {
   .chime-sticky-bar {
     position: sticky;

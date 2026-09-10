@@ -58,7 +58,7 @@ const ENTRIES: Array<{ term: string; def: string }> = [
   },
   {
     term: 'Unison · Octave · Carillon',
-    def: 'Musical ranks for correct-chime streaks: 2 in a row is Unison, 3 is Octave, 5 is Carillon. Words, not points.',
+    def: 'Musical ranks for showing up: 2 windows voiced is Unison, 3 is Octave, 5 is Carillon. Participation, not correctness. Words, not points.',
   },
 ]
 

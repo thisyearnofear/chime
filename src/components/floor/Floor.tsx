@@ -41,10 +41,12 @@ export function Floor() {
     return seriesFromSearch(params.get('asset'), params.get('window'))
   }, [params])
 
-  // ?chime=NN — integer 0–100 encoding the finalUp % from a shared tweet
+  // ?chime=NN — integer 0–100 encoding the finalUp % from a shared tweet.
+  // Non-numeric values are treated as absent (no banner, no misleading 50¢).
   const chimeParam = params.get('chime')
-  const arrivedViaChime = chimeParam !== null && chimeParam !== '1'
-    ? Number(chimeParam)   // numeric pct e.g. ?chime=67
+  const parsedChime = chimeParam !== null && chimeParam !== '1' ? Number(chimeParam) : null
+  const arrivedViaChime = parsedChime !== null && Number.isFinite(parsedChime)
+    ? parsedChime
     : chimeParam === '1'
       ? -1                 // legacy ?chime=1 (no pct encoded)
       : null               // not a chime deep-link
@@ -125,22 +127,32 @@ export function Floor() {
   const left = window ? secondsLeft(window.expiry) : 0
   const hasBook = window?.bestBid != null || window?.bestAsk != null
   const showTension =
-    window?.status === 1 && hasBook && left > 15 && left <= 60
+    window?.status === 1 && !window.demo && hasBook && left > 15 && left <= 60
 
   // Halt-zone styling for the price/time line (live book, final 30s)
   const haltLive = window?.status === 1 && !window.demo && hasBook && left < 30
 
-  // Ritual progress: chime = free voice this window, stake = follow/fade event
+  // Ritual progress, scoped to the current window (own events carry marketId).
+  // `observe` is always done — you are looking at the floor.
   const chimedThisWindow = useChorusStore((s) => s.chimes)
   const hasChimed = window
     ? chimedThisWindow.some((c) => c.marketId === window.marketId)
     : false
-  const hasStaked = events.some((e) => e.type === 'follow' || e.type === 'fade')
+  const windowStake = window
+    ? events.find(
+        (e) =>
+          (e.type === 'follow' || e.type === 'fade') &&
+          (!e.marketId || e.marketId === window.marketId)
+      )
+    : undefined
+  const hasStaked = Boolean(windowStake?.side)
   const hasClaimed = events.some((e) => e.type === 'claim')
 
-  // Voices CTA: scroll to Follow/Fade when tapped
+  // Voices CTA: scroll to the VISIBLE Follow/Fade (mobile + desktop both render)
+  // innerWidth is read at tap time, not render time — no reactive dep needed.
   const scrollToFollowFade = useCallback(() => {
-    const el = document.getElementById('follow-fade')
+    const mobile = typeof globalThis.window !== 'undefined' && globalThis.window.innerWidth < 1024
+    const el = document.getElementById(mobile ? 'follow-fade-mobile' : 'follow-fade-desktop')
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }, [])
 
@@ -258,10 +270,8 @@ export function Floor() {
             {window?.demo && (
               <p className="mt-4 text-[12px] text-[var(--brass)]">Demo clock — stakes are simulated, nothing on-chain.</p>
             )}
-            <div className="lg:hidden mt-6 pt-5 border-t border-[var(--line)]">
-              <div className="chime-sticky-bar">
-                <FollowFadeBar />
-              </div>
+            <div className="lg:hidden mt-6 pt-5 border-t border-[var(--line)] chime-sticky-bar">
+              <FollowFadeBar barId="follow-fade-mobile" />
             </div>
           </Frame>
 
@@ -285,7 +295,7 @@ export function Floor() {
             seats={decision?.seats}
             allegiance={allegiance}
             onPick={setAllegiance}
-            action={<FollowFadeBar />}
+            action={<FollowFadeBar barId="follow-fade-desktop" />}
             upPct={upPct}
             secondsLeft={left}
           />

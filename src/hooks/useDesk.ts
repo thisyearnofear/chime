@@ -13,7 +13,7 @@ import type { DeskFill, DeskPosition } from '@/types/markets'
 export function useDesk() {
   const { address, isConnected, connect } = useWallet()
   const { rebind } = useExchange()
-  const { events, hydrate, lastTxHash, setLastTxHash } = usePositionStore()
+  const { events, hydrate, lastTxHash, setLastTxHash, pushEvent } = usePositionStore()
   const window = useMarketStore((s) => s.window)
   const addToast = useAddToast()
   const [positions, setPositions] = useState<DeskPosition[]>([])
@@ -69,6 +69,17 @@ export function useDesk() {
       await rebind()
       const { claimed, hashes } = await redeemWinnings(address ?? undefined)
       if (hashes[0]) setLastTxHash(hashes[0])
+      if (claimed > 0) {
+        pushEvent({
+          id: hashes[0] ?? `claim-${Date.now()}`,
+          type: 'claim',
+          at: Date.now(),
+          title: `Claimed ${claimed} position(s)`,
+          detail: hashes[0] ? `${hashes[0].slice(0, 10)}…` : undefined,
+          txHash: hashes[0],
+          marketId: window?.marketId,
+        })
+      }
       addToast({
         type: claimed ? 'success' : 'info',
         message: claimed
@@ -84,7 +95,7 @@ export function useDesk() {
     } finally {
       setClaiming(false)
     }
-  }, [address, rebind, addToast, setLastTxHash, refresh])
+  }, [address, rebind, addToast, setLastTxHash, pushEvent, window, refresh])
 
   const claimable = positions.some((p) => p.claimable)
 

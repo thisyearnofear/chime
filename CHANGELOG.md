@@ -2,6 +2,39 @@
 
 Working log of shipped changes. Dates in YYYY-MM-DD.
 
+## 2026-09-11 — Review fixes: sticky, dots, countdown, deep-links, ledger
+
+Follow-up to the UX clarity pass — every P0 from the review:
+
+- **Sticky bar actually sticks** (`Floor.tsx`, `globals.css`) —
+  `.chime-sticky-bar` moved to the outer mobile wrapper whose parent is the
+  tall WINDOW column. Inner-div sticky could never engage.
+- **Claim dot can light** (`useDesk.ts`) — successful `redeemWinnings`
+  pushes a `claim` TimelineEvent (tx hash + window marketId). Ritual stake
+  scoped to the current window like `userSide` (no more forever-brass from
+  an old follow).
+- **Next-open countdown fixed** (`ChimeLanding.tsx`) — windows are contiguous
+  buckets, so the hook counts to `expiry`, not `expiry + interval`. Was one
+  full interval (e.g. 15:00) too late on every close.
+- **TensionShare hidden on demo** (`Floor.tsx`) — demo tweets no longer share
+  a live-window URL into the wrong funnel.
+- **`?chime=abc` no longer shows a 50¢ banner** (`Floor.tsx`) — non-numeric
+  values treated as absent via `Number.isFinite`.
+- **Voices CTA scrolls to the visible bar** (`Floor.tsx`, `FollowFadeBar.tsx`)
+  — mobile/desktop instances get distinct ids (`follow-fade-mobile` /
+  `-desktop`); the tap handler picks by `innerWidth`. Desktop CTA worked on
+  a hidden node before.
+- **Ledger polish** (`dashboard/page.tsx`) — meta drops `· 0 claimable`;
+  `N fill` singular; `no fills yet` / `N open` meta voice matches POSITIONS;
+  rows get `aria-label` toggles, tx row is a `div`, `net` passed as prop;
+  latest-tx row opens by default (uncontrolled after mount, re-mounts on
+  re-sort via stable keys).
+- **Glossary aligned** (`help/page.tsx`, `chorusStore.ts`) — Unison / Octave /
+  Carillon defined as participation (windows voiced), matching the streak
+  display. One definition everywhere.
+
+Validation: `npm run lint` clean, `npx tsc --noEmit` exit 0, `next build` 13/13.
+
 ## 2026-09-11 — UX clarity pass: ladder, gate, sticky bar, ledger, ritual
 
 P0 comprehension — Floor WINDOW reads observe → chime → stake:
