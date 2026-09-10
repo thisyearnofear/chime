@@ -10,11 +10,22 @@ interface WindowClockProps {
   upProbability: number
   locked?: boolean
   compact?: boolean
+  /** Called once when the window transitions to done (CHIME moment) */
+  onChime?: (finalUp: number) => void
 }
 
-export function WindowClock({ window, upProbability, locked, compact }: WindowClockProps) {
+export function WindowClock({ window, upProbability, locked, compact, onChime }: WindowClockProps) {
   const [, setTick] = useState(0)
   const wasOpen = useRef(false)
+  /** Frozen final up-probability captured at the moment of close */
+  const [cascadeUp, setCascadeUp] = useState<number | null>(null)
+  /** Whether the cascade ring-sweep animation is running */
+  const [sweeping, setSweeping] = useState(false)
+  const prefersReduced = useRef(false)
+
+  useEffect(() => {
+    prefersReduced.current = globalThis.matchMedia('(prefers-reduced-motion: reduce)').matches
+  }, [])
 
   useEffect(() => {
     const id = setInterval(() => setTick((n) => n + 1), 250)
@@ -29,17 +40,7 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
   const hasBook = window?.bestBid != null || window?.bestAsk != null
   const up = hasBook ? Math.min(0.92, Math.max(0.08, upProbability)) : 0.5
 
-  const size = compact ? 220 : 360
-  const cx = size / 2
-  const cy = size / 2
-  const r = compact ? 84 : 138
-  const circ = 2 * Math.PI * r
-  const dash = circ * remain
-  const display = !window ? '—' : done ? 'CHIME' : formatCountdown(left)
-  const cadence = window ? `${window.asset} ${formatInterval(window.intervalSec)}` : '…'
-  const ringR = r - (compact ? 14 : 18)
-  const ringCirc = 2 * Math.PI * ringR
-
+  // Fire once on the done transition: freeze final probability, animate cascade
   useEffect(() => {
     if (!window) return
     if (!done) {
@@ -49,8 +50,38 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
     if (wasOpen.current) {
       wasOpen.current = false
       playClosingBell()
+      const final = hasBook ? Math.min(0.92, Math.max(0.08, upProbability)) : 0.5
+      setCascadeUp(final)
+      onChime?.(final)
+      if (!prefersReduced.current) {
+        setSweeping(true)
+        setTimeout(() => setSweeping(false), 2000)
+      }
     }
-  }, [done, window])
+  }, [done, window, hasBook, upProbability, onChime])
+
+  const size = compact ? 220 : 360
+  const cx = size / 2
+  const cy = size / 2
+  const r = compact ? 84 : 138
+  const circ = 2 * Math.PI * r
+  const dash = circ * remain
+  const ringR = r - (compact ? 14 : 18)
+  const ringCirc = 2 * Math.PI * ringR
+
+  // After close, use frozen cascadeUp so the ring stays at final state
+  const displayUp = done && cascadeUp !== null ? cascadeUp : up
+  const cadence = window ? `${window.asset} ${formatInterval(window.intervalSec)}` : '…'
+
+  // Display logic: during 2s cascade show final %, then switch to CHIME
+  const finalPct = cascadeUp !== null ? Math.round(cascadeUp * 100) : null
+  const display = !window
+    ? '—'
+    : done && sweeping && finalPct !== null
+      ? `↑${finalPct}¢`
+      : done
+        ? 'CHIME'
+        : formatCountdown(left)
 
   return (
     <svg
@@ -81,6 +112,7 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
         )
       })}
       <circle cx={cx} cy={cy} r={r} fill="var(--paper)" stroke="var(--line)" strokeWidth="1" />
+      {/* Remaining-time arc */}
       <circle
         cx={cx}
         cy={cy}
@@ -93,6 +125,7 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
         transform={`rotate(-90 ${cx} ${cy})`}
         opacity={done ? 0.25 : 1}
       />
+      {/* Implied-up ring — animates to final value on cascade */}
       {hasBook && (
         <>
           <circle cx={cx} cy={cy} r={ringR} fill="none" stroke="var(--line)" strokeWidth="1" />
@@ -102,9 +135,10 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
             r={ringR}
             fill="none"
             stroke="var(--brass)"
-            strokeWidth="4"
-            strokeDasharray={`${ringCirc * up} ${ringCirc}`}
+            strokeWidth={sweeping ? 6 : 4}
+            strokeDasharray={`${ringCirc * displayUp} ${ringCirc}`}
             transform={`rotate(-90 ${cx} ${cy})`}
+            style={sweeping ? { transition: 'stroke-dasharray 1.8s cubic-bezier(0.4,0,0.2,1), stroke-width 0.3s' } : undefined}
           />
           <circle
             cx={cx}
@@ -112,34 +146,38 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
             r={ringR}
             fill="none"
             stroke="var(--slate)"
-            strokeWidth="4"
-            strokeDasharray={`${ringCirc * (1 - up)} ${ringCirc}`}
-            strokeDashoffset={-(ringCirc * up)}
+            strokeWidth={sweeping ? 6 : 4}
+            strokeDasharray={`${ringCirc * (1 - displayUp)} ${ringCirc}`}
+            strokeDashoffset={-(ringCirc * displayUp)}
             transform={`rotate(-90 ${cx} ${cy})`}
+            style={sweeping ? { transition: 'stroke-dasharray 1.8s cubic-bezier(0.4,0,0.2,1), stroke-width 0.3s' } : undefined}
           />
         </>
       )}
       <circle cx={cx} cy={cy} r={compact ? 52 : 78} fill="none" stroke="var(--line)" strokeWidth="1" />
+      {/* Centre numeral: final % during sweep, then CHIME */}
       <text
         x={cx}
         y={cy - 4}
         textAnchor="middle"
-        fill={done ? 'var(--brass)' : 'var(--ink)'}
+        fill="var(--brass)"
         fontFamily="var(--font-jetbrains), ui-monospace, monospace"
-        fontSize={compact || display.length > 5 ? 28 : 40}
+        fontSize={compact || display.length > 5 ? 28 : done && sweeping ? 32 : 40}
         fontWeight="500"
       >
         {display}
       </text>
+      {/* During cascade: show "closed at" sub-label */}
       <text
         x={cx}
         y={cy + 24}
         textAnchor="middle"
-        fill="var(--mute)"
+        fill={sweeping ? 'var(--brass)' : 'var(--mute)'}
         fontFamily="var(--font-jetbrains), ui-monospace, monospace"
         fontSize="12"
+        style={sweeping ? { transition: 'fill 0.4s' } : undefined}
       >
-        {cadence}
+        {sweeping ? 'closed at' : cadence}
       </text>
     </svg>
   )
