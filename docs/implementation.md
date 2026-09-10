@@ -58,6 +58,12 @@ Goal: when a window finalizes, redeem held outcome shares on chain.
 
 `loadDesk` first reads the active window's seat balances directly via `client.getOutcomeBalance` and then asks the indexer for the full portfolio; the union is the position set. `redeemWinnings` walks every claimable position in the portfolio, redeems each outcome token, and returns the tx hashes for the ledger.
 
+Proved live on 2026-09-10 (see `CHANGELOG.md`): two `BUY_YES` IOC fills took
+the live book with no seeding (ETH 5m 15:15Z and 15:25Z); both were
+chain-visible before the indexer caught up. The 15:15Z window finalized Down
+against a YES ticket, so `redeemHeld` correctly paid 0. A winning payout tx
+is still unproven.
+
 ## Stores
 
 - `useMarketStore` — series, current `LiveWindow`, catalog, last 40 mids (`withBookSample`), tape prints.

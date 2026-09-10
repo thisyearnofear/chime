@@ -2,6 +2,33 @@
 
 Working log of shipped changes. Dates in YYYY-MM-DD.
 
+## 2026-09-10 — Live loop proof on Shannon testnet
+
+Proved all three loops against the live DreamDEX venue (`0x679795a0…`) with
+`scripts/prove-loop.mjs` (key from `.env.local`, never logged).
+
+- **Follow (live book, no seed)** — two IOC fills, both taken straight off the
+  book (`seeded counterparty: false`):
+  - `BUY_YES 5 @ 0.477` on the ETH 5m window exp 15:15Z. Fill receipt:
+    `shannon-explorer.somnia.network` tx `e53aa249…871bca04`.
+  - `BUY_YES 5 @ 0.429` on the ETH 5m window exp 15:25Z. Fill receipt:
+    `shannon-explorer.somnia.network` tx `63d2dfab…11f68407`.
+  - Both fills visible via `getOutcomeBalance` (`chain YES 5000000`) before the
+    indexer caught up — the Desk's on-chain-first read (`loadChainSeat`) works
+    as designed. Both fills later appeared in `getPortfolio` trades.
+- **Claim (correct zero on losers)** — the 15:15Z window finalized Down
+  (`winningOutcome 1`) while the ticket held YES; `redeemHeld` read both
+  balances and skipped the zero winning-side balance. The older `…16d3a`
+  NO ticket likewise lost (winner 0/Up). `claimScan` swept 21 markets, paid 0 —
+  the right answer for two losing tickets. A winning redemption (payout tx)
+  is still unproven; it needs a ticket on the winning side.
+- **Stale-cache note** — `.data/chime-live.json` still held Sept-8 rows until a
+  fresh `/api/markets/live` hit. `stillOpen()` filters expired rows on read
+  and the file rewrites on refresh, so the Floor self-heals. Reload `/` after
+  a cold start if the switcher looks dated.
+
+Validation: `npm run lint` clean, `npx tsc --noEmit` exit 0.
+
 ## 2026-09-08 — Design compliance sweep
 
 After a vision-vs-code review against `design.md` and the chime-floor skill, brought the floor back into compliance and tightened the runtime.
