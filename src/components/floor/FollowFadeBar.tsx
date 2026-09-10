@@ -13,6 +13,7 @@ import { playChimeIn } from '@/lib/chime-sound'
 import { getMarketNetwork } from '@/lib/markets/config'
 import { sizeForPersonality } from '@/lib/agents/mapping'
 import { formatSide, secondsLeft } from '@/lib/markets/format'
+import { chorusRank } from '@/stores/chorusStore'
 
 export function FollowFadeBar() {
   const { window } = useMarketStore()
@@ -30,6 +31,9 @@ export function FollowFadeBar() {
   const size = followed ? sizeForPersonality(followed.label, defaultSize) : defaultSize
   const fresh = !isConnected || !stake
   const myChime = window ? myChimes.find((c) => c.marketId === window.marketId) : undefined
+  // Participation streak: distinct windows chimed, shown as a word not points
+  const streak = new Set(myChimes.map((c) => c.marketId)).size
+  const rank = chorusRank(streak)
 
   const onChime = (side: 'up' | 'down') => {
     if (!window || window.status !== 1) return
@@ -62,6 +66,7 @@ export function FollowFadeBar() {
               : chimed
                 ? 'Chimed in — voice on the tape'
                 : 'Chime in free — no wallet, just a take'}
+            {rank ? <span className="text-[var(--brass)]"> · {rank}</span> : null}
           </p>
           <div className="flex gap-3">
             <Tap tone="ghost" disabled={!window || window.status !== 1} onClick={() => onChime('up')}>

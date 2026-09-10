@@ -32,10 +32,42 @@ function ShareFill({ txHash }: { txHash?: string }) {
           setTimeout(() => setCopied(false), 2000)
         })
       }}
-      className="text-[11px] text-[var(--mute)] hover:text-[var(--brass)] mt-1 ml-3 inline-block"
+      className="text-[11px] text-[var(--mute)] hover:text-[var(--brass)] transition-colors"
     >
-      {copied ? 'copied' : 'share fill'}
+      {copied ? 'copied ✓' : '↗ share'}
     </button>
+  )
+}
+
+/** One ledger row — summary visible, tx + share behind a tap. */
+function LedgerRow({ row, index }: { row: DeskFill | TimelineEvent; index: number }) {
+  const [open, setOpen] = useState(index === 0)
+  return (
+    <li className="py-4 border-t border-[var(--line)] first:border-t-0 text-[13px]">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full flex items-baseline justify-between gap-4 text-left"
+      >
+        <span className="text-[var(--ink)]">{row.title}</span>
+        <span className="shrink-0 text-[11px] text-[var(--mute)]">{open ? '–' : '+'}</span>
+      </button>
+      {row.detail && <p className="text-[var(--mute)] mt-1 text-[12px]">{row.detail}</p>}
+      {open && row.txHash && (
+        <span className="mt-2 flex items-center gap-3">
+          <Link
+            href={explorerTx(getMarketNetwork().blockExplorer, row.txHash)}
+            target="_blank"
+            rel="noreferrer"
+            className="text-[var(--brass)] text-[12px] hover:underline"
+          >
+            {row.txHash.slice(0, 10)}…
+          </Link>
+          <ShareFill txHash={row.txHash} />
+        </span>
+      )}
+    </li>
   )
 }
 
@@ -64,6 +96,7 @@ export default function DashboardPage() {
     (event) => !event.txHash || !fills.some((fill) => fill.txHash?.toLowerCase() === event.txHash?.toLowerCase())
   )
   const ledger = [...sessionOnly, ...chainFills].sort((a, b) => (b.at ?? 0) - (a.at ?? 0))
+  const claimableCount = positions.filter((p) => p.claimable).length
 
   return (
     <Page>
@@ -168,7 +201,7 @@ export default function DashboardPage() {
         </ul>
       </Frame>
 
-      <Frame label="LEDGER" meta={ledger.length ? `${ledger.length}` : 'empty'}>
+      <Frame label="LEDGER" meta={ledger.length ? `${ledger.length} fills · ${claimableCount} claimable` : 'empty'}>
         <ol>
           {ledger.length === 0 && (
             <li className="py-4 text-[13px] text-[var(--mute)]">
@@ -177,24 +210,8 @@ export default function DashboardPage() {
                 : 'Follow or fade a window. Fills land here.'}
             </li>
           )}
-          {ledger.map((row) => (
-            <li key={fillKey(row)} className="py-4 border-t border-[var(--line)] first:border-t-0 text-[13px]">
-              <p className="text-[var(--ink)]">{row.title}</p>
-              {row.detail && <p className="text-[var(--mute)] mt-1">{row.detail}</p>}
-              {row.txHash && (
-                <>
-                  <a
-                    href={explorerTx(net.blockExplorer, row.txHash)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[var(--brass)] mt-1 inline-block"
-                  >
-                    {row.txHash.slice(0, 10)}…
-                  </a>
-                  <ShareFill txHash={row.txHash} />
-                </>
-              )}
-            </li>
+          {ledger.map((row, i) => (
+            <LedgerRow key={fillKey(row)} row={row} index={i} />
           ))}
         </ol>
       </Frame>

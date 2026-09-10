@@ -154,6 +154,22 @@ body > * {
   animation: chime-rise 0.2s ease-out 1;
 }
 
+/* Mobile action bar — Follow/Fade stays thumb-reachable while the floor scrolls */
+@media (max-width: 1023px) {
+  .chime-sticky-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    margin-left: calc(-1 * var(--pad));
+    margin-right: calc(-1 * var(--pad));
+    margin-bottom: calc(-1 * var(--pad));
+    padding: var(--pad);
+    padding-bottom: max(var(--pad), env(safe-area-inset-bottom));
+    background: var(--paper);
+    border-top: 1px solid var(--line);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .chime-mark {
     animation: none;

@@ -2,6 +2,45 @@
 
 Working log of shipped changes. Dates in YYYY-MM-DD.
 
+## 2026-09-11 — UX clarity pass: ladder, gate, sticky bar, ledger, ritual
+
+P0 comprehension — Floor WINDOW reads observe → chime → stake:
+
+- **Price + time one-liner** (`Floor.tsx`) — `↑NN¢ · M:SS left` under the
+  clock, halt-red in the final 30s; locked state lives in the line, empty
+  book points at Watch, loading says `Connecting…` in the same slot.
+- **Ladder order** — hero → voices → book context behind a rule →
+  TensionShare after the book → demo note. Floating explainer + duplicate
+  locked/connecting lines removed.
+- **One countdown language** — TensionShare tweet + aria use
+  `CADENCE · M:SS left · ↑NN¢`, matching Floor + Watch.
+- **Zero-state voices CTA** — `Be the first voice — chime in free` at 0
+  voices instead of silence.
+
+P1 action clarity:
+
+- **Follow/Fade gated on a seat tap** (`FollowFadeBar.tsx`) — no allegiance
+  shows `Tap a seat to ride — 01/02 above` + why; buttons stay disabled.
+- **Sticky mobile action bar** (`globals.css` `.chime-sticky-bar`) — mobile
+  Follow/Fade pins to the bottom with safe-area padding + top rule.
+- **Desk summary-first ledger** (`dashboard/page.tsx`) — meta reads
+  `N fills · M claimable`; rows collapse to title + detail with tx + `↗ share`
+  behind a `+`/`–` tap (first row open).
+
+P2 delight (CSS only, no new deps):
+
+- **Numeral cross-fade** (`.chime-numeral`, 150ms) + **press feedback**
+  (`Tap` `active:scale-[0.98]`) + **rise-in** (`.chime-rise`, 200ms) for
+  TensionShare / ChimeCard / zero-state CTA. All `prefers-reduced-motion` safe.
+- **Ritual dots** (`ChimeLanding.tsx` → `RitualDots`, wired in `Floor.tsx`) —
+  `observe · chime · stake · claim`, brass = done, under the hero.
+- **Streak rank at the chime control** (`FollowFadeBar.tsx` + `chorusRank`) —
+  distinct windows chimed shown as Unison / Octave / Carillon. Words, not points.
+- **Post-close hook for every close** (`ChimeLanding` compact) — next-open
+  countdown or live redirect under the price, not just `?chime=` arrivals.
+
+Validation: `npm run lint` clean, `npx tsc --noEmit` exit 0, `next build` 12/12.
+
 ## 2026-09-10 — Shared chorus: the crowd is real + opposed-sides money shot
 
 - **`/api/chorus`** (`route.ts` + `lib/chorus/server.ts`) — shared tally per

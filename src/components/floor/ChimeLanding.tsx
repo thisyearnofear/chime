@@ -5,6 +5,34 @@ import { formatCountdown, formatInterval, impliedUp, secondsLeft } from '@/lib/m
 import { useMarketStore } from '@/stores/marketStore'
 import type { LiveWindow } from '@/types/markets'
 
+/** Four-dot ritual indicator — observe · chime · stake · claim. Brass = done. */
+export function RitualDots({
+  chimed,
+  staked,
+  claimed,
+}: {
+  chimed: boolean
+  staked: boolean
+  claimed: boolean
+}) {
+  const dots = [
+    { label: 'observe', done: true },
+    { label: 'chime', done: chimed },
+    { label: 'stake', done: staked },
+    { label: 'claim', done: claimed },
+  ]
+  return (
+    <p className="mt-3 text-[11px] text-[var(--mute)]" aria-label="Your ritual: observe, chime, stake, claim">
+      {dots.map((d, i) => (
+        <span key={d.label}>
+          {i > 0 && <span aria-hidden> · </span>}
+          <span className={d.done ? 'text-[var(--brass)]' : undefined}>{d.label}</span>
+        </span>
+      ))}
+    </p>
+  )
+}
+
 interface ChimeLandingProps {
   /** The window encoded in the deep-link (currently locked/closed) */
   window: LiveWindow | null

@@ -10,7 +10,7 @@ import { DebateTicker } from './DebateTicker'
 import { FollowFadeBar } from './FollowFadeBar'
 import { SeriesSwitcher } from './SeriesSwitcher'
 import { ChimeCard } from './ChimeCard'
-import { ChimeLanding } from './ChimeLanding'
+import { ChimeLanding, RitualDots } from './ChimeLanding'
 import { TensionShare } from './TensionShare'
 import { WindowStory } from './WindowStory'
 import { Frame } from '@/components/ui/Frame'
@@ -21,6 +21,7 @@ import { useAgentStore } from '@/stores/agentStore'
 import { useExchange } from '@/hooks/useExchange'
 import { useVoices } from '@/hooks/useVoices'
 import { seriesFromSearch, useMarketStore } from '@/stores/marketStore'
+import { useChorusStore } from '@/stores/chorusStore'
 import { usePositionStore } from '@/stores/positionStore'
 import { getPersonality } from '@/lib/personality-presets'
 import { formatCountdown, formatInterval, impliedUp, secondsLeft } from '@/lib/markets/format'
@@ -129,6 +130,14 @@ export function Floor() {
   // Halt-zone styling for the price/time line (live book, final 30s)
   const haltLive = window?.status === 1 && !window.demo && hasBook && left < 30
 
+  // Ritual progress: chime = free voice this window, stake = follow/fade event
+  const chimedThisWindow = useChorusStore((s) => s.chimes)
+  const hasChimed = window
+    ? chimedThisWindow.some((c) => c.marketId === window.marketId)
+    : false
+  const hasStaked = events.some((e) => e.type === 'follow' || e.type === 'fade')
+  const hasClaimed = events.some((e) => e.type === 'claim')
+
   // Voices CTA: scroll to Follow/Fade when tapped
   const scrollToFollowFade = useCallback(() => {
     const el = document.getElementById('follow-fade')
@@ -206,6 +215,7 @@ export function Floor() {
             </p>
 
             <p className="mt-3 text-[15px] text-[var(--ink)]">Two seats. One window. Chime in.</p>
+            <RitualDots chimed={hasChimed} staked={hasStaked} claimed={hasClaimed} />
 
             {/* Voices — zero-state recruits, count reports, 3+ is a CTA */}
             {voices === 0 ? (
@@ -249,7 +259,9 @@ export function Floor() {
               <p className="mt-4 text-[12px] text-[var(--brass)]">Demo clock — stakes are simulated, nothing on-chain.</p>
             )}
             <div className="lg:hidden mt-6 pt-5 border-t border-[var(--line)]">
-              <FollowFadeBar />
+              <div className="chime-sticky-bar">
+                <FollowFadeBar />
+              </div>
             </div>
           </Frame>
 

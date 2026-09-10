@@ -24,8 +24,10 @@ Goal: a spectator with no wallet sees the live window, the two seats, and the im
 | Window story (opened · high · now) | `src/components/floor/WindowStory.tsx` (hidden until 2+ mids, spread ≥ 3¢) |
 | Close cascade (↑NN¢ sweep → CHIME) | `src/components/floor/WindowClock.tsx` (`onChime`, 2s sweep, `prefers-reduced-motion` safe) |
 | Shareable result card | `src/components/floor/ChimeCard.tsx` (SVG snapshot, voices, `?chime=NN` deep-link, Post on X) |
-| Deep-link landing banner | `src/components/floor/ChimeLanding.tsx` (closed result + next-open countdown) |
-| Pre-close share button | `src/components/floor/TensionShare.tsx` (last 60s, 15s < left ≤ 60s) |
+| Deep-link landing banner | `src/components/floor/ChimeLanding.tsx` (closed result + next-open countdown; compact mode = post-close hook for every close; also exports `RitualDots`: observe · chime · stake · claim) |
+| Pre-close share button | `src/components/floor/TensionShare.tsx` (last 60s, 15s < left ≤ 60s; `CADENCE · M:SS left · ↑NN¢` language, rises in) |
+| Price + time one-liner | `src/components/floor/Floor.tsx` (`↑NN¢ · M:SS left`, halt-red <30s, `.chime-numeral` cross-fade) |
+| Streak rank at chime control | `src/components/floor/FollowFadeBar.tsx` + `chorusRank()` — distinct windows chimed → Unison / Octave / Carillon |
 | Frame + corner ticks | `src/components/ui/Frame.tsx` |
 | Book + status fetch | `src/hooks/useLiveWindow.ts` → `src/lib/markets/windows.ts` |
 | Seat copy (LLM or heuristic) | `src/hooks/useWindowAgents.ts` → `src/lib/agents/decide.ts` |
@@ -40,7 +42,8 @@ Goal: with one tap, take the followed seat's side or fade it. The order is an IO
 | --- | --- |
 | Allegiance picker (one row tap) | `src/components/floor/AgentPit.tsx` |
 | `?ride=Label` deep-link pre-select | `src/components/floor/Floor.tsx` reads `rideParam` → `getPersonality().label` (priority over `localStorage`) |
-| Follow/Fade control | `src/components/floor/FollowFadeBar.tsx` |
+| Follow/Fade control (gated on seat tap) | `src/components/floor/FollowFadeBar.tsx` (no allegiance → `Tap a seat to ride`; mobile bar pins via `.chime-sticky-bar`) |
+| Press feedback on money buttons | `src/components/ui/Tap.tsx` (`active:scale-[0.98]` + tone brightness) |
 | Trade executor | `src/hooks/useFollowTrade.tsx` |
 | IOC placement | `src/lib/markets/trade.ts` → `placeFollowOrder` |
 | Wallet binding | `src/hooks/useExchange.ts` |
@@ -57,7 +60,7 @@ Goal: when a window finalizes, redeem held outcome shares on chain.
 
 | Surface | File |
 | --- | --- |
-| Claim button + positions + ledger + ShareFill | `src/app/dashboard/page.tsx` |
+| Claim button + positions + summary-first ledger | `src/app/dashboard/page.tsx` (meta `N fills · M claimable`; rows collapse to title + detail, tx + share behind `+`/`–`) |
 | Loader | `src/hooks/useDesk.ts` |
 | On-chain + indexer merge | `src/lib/markets/desk.ts` |
 | Redeemer | `src/lib/markets/trade.ts` → `redeemWinnings` |
