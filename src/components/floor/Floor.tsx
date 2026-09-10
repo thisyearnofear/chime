@@ -23,7 +23,8 @@ import { useVoices } from '@/hooks/useVoices'
 import { seriesFromSearch, useMarketStore } from '@/stores/marketStore'
 import { usePositionStore } from '@/stores/positionStore'
 import { getPersonality } from '@/lib/personality-presets'
-import { formatInterval, impliedUp, secondsLeft } from '@/lib/markets/format'
+import { formatCountdown, formatInterval, impliedUp, secondsLeft } from '@/lib/markets/format'
+import { cn } from '@/lib/utils'
 import { getMarketNetwork } from '@/lib/markets/config'
 import type { Side } from '@/types/markets'
 
@@ -50,7 +51,7 @@ export function Floor() {
   // ?ride=Label — pre-select allegiance from a Roster share link
   const rideParam = params.get('ride')
 
-  const { window, loading, usingDemo } = useLiveWindow(series)
+  const { window } = useLiveWindow(series)
   const { decision } = useWindowAgents(window)
   const allegiance = useAgentStore((s) => s.allegiance)
   const setAllegiance = useAgentStore((s) => s.setAllegiance)
@@ -125,6 +126,9 @@ export function Floor() {
   const showTension =
     window?.status === 1 && hasBook && left > 15 && left <= 60
 
+  // Halt-zone styling for the price/time line (live book, final 30s)
+  const haltLive = window?.status === 1 && !window.demo && hasBook && left < 30
+
   // Voices CTA: scroll to Follow/Fade when tapped
   const scrollToFollowFade = useCallback(() => {
     const el = document.getElementById('follow-fade')
@@ -152,6 +156,11 @@ export function Floor() {
         <ChimeLanding window={window} finalUpPct={landingFinalPct} />
       )}
 
+      {/* Post-close hook: every close (not just ?chime=) counts down to next open */}
+      {!showLanding && cardVisible && chimeState && window && chimeState.marketId === window.marketId && (
+        <ChimeLanding window={window} finalUpPct={Math.round(chimeState.finalUp * 100)} compact />
+      )}
+
       <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,380px)] gap-[var(--gap)] items-start">
         <div className="flex flex-col gap-[var(--gap)]">
           <Frame
@@ -171,64 +180,91 @@ export function Floor() {
               />
             </div>
 
-            {/* Voices — plain count below threshold, CTA at 3+ */}
-            {voices > 0 && (
-              voices >= 3 ? (
-                <button
-                  type="button"
-                  onClick={scrollToFollowFade}
-                  className="mt-3 text-[11px] text-left hover:text-[var(--brass)] transition-colors"
-                >
-                  <span className="text-[var(--brass)]">{voices}</span>
-                  {' traders chimed in — '}
-                  <span className="underline underline-offset-2">join them</span>
-                </button>
+            {/* Price + time — one line, every tick, halt-red in the final 30s */}
+            <p
+              aria-live="off"
+              className={cn(
+                'mt-3 text-[13px]',
+                haltLive ? 'text-[var(--halt)]' : 'text-[var(--ink)]'
+              )}
+            >
+              {window && hasBook ? (
+                <>
+                  <span className="chime-numeral" key={upPct}>↑{upPct}¢</span>
+                  {' · '}
+                  {window.status === 1 ? (
+                    <>{formatCountdown(left)} left</>
+                  ) : (
+                    <>locked — wait for the next chime</>
+                  )}
+                </>
+              ) : window && !hasBook ? (
+                <span className="text-[var(--mute)]">No book yet — check Watch for live windows</span>
               ) : (
-                <p className="mt-3 text-[11px] text-[var(--mute)]">
-                  <span className="text-[var(--brass)]">{voices}</span>
-                  {voices === 1 ? ' voice' : ' voices'} chimed in
-                </p>
-              )
-            )}
-
-            <p className="mt-3 text-[15px] text-[var(--ink)]">Two seats. One window. Chime in.</p>
-            <p className="mt-1 text-[12px] text-[var(--mute)]">
-              Chime free for a voice · follow rides the seat · fade takes the other side · winners claim on Desk
+                <span className="text-[var(--mute)]">Connecting…</span>
+              )}
             </p>
 
-            {/* TensionShare — last 60s of a live window */}
-            {showTension && (
-              <TensionShare window={window} upPct={upPct} secondsLeft={left} />
+            <p className="mt-3 text-[15px] text-[var(--ink)]">Two seats. One window. Chime in.</p>
+
+            {/* Voices — zero-state recruits, count reports, 3+ is a CTA */}
+            {voices === 0 ? (
+              <button
+                type="button"
+                onClick={scrollToFollowFade}
+                className="chime-rise mt-3 text-[11px] text-left text-[var(--mute)] hover:text-[var(--brass)] transition-colors"
+              >
+                Be the first voice — <span className="underline underline-offset-2">chime in free</span>
+              </button>
+            ) : voices >= 3 ? (
+              <button
+                type="button"
+                onClick={scrollToFollowFade}
+                className="mt-3 text-[11px] text-left hover:text-[var(--brass)] transition-colors"
+              >
+                <span className="text-[var(--brass)]">{voices}</span>
+                {' traders chimed in — '}
+                <span className="underline underline-offset-2">join them</span>
+              </button>
+            ) : (
+              <p className="mt-3 text-[11px] text-[var(--mute)]">
+                <span className="text-[var(--brass)]">{voices}</span>
+                {voices === 1 ? ' voice' : ' voices'} chimed in
+              </p>
             )}
 
-            <div className="mt-3">
+            <div className="mt-6 pt-5 border-t border-[var(--line)]">
               <DebateTicker seats={decision?.seats} />
               <WindowStory mids={mids} />
               <ImpliedSpark mids={mids} window={window} />
               <ProbabilityRail window={window} />
             </div>
-            {usingDemo && (
-              <p className="mt-4 text-[12px] text-[var(--mute)]">No live book for this cadence. Live windows are listed above.</p>
+
+            {/* TensionShare — after the book context, before the stake control */}
+            {showTension && (
+              <TensionShare window={window} upPct={upPct} secondsLeft={left} />
             )}
-            {window && !window.demo && window.status !== 1 && (
-              <p className="mt-4 text-[12px] text-[var(--brass)]">Window locked — wait for the next chime</p>
+
+            {window?.demo && (
+              <p className="mt-4 text-[12px] text-[var(--brass)]">Demo clock — stakes are simulated, nothing on-chain.</p>
             )}
-            {loading && !window && <p className="mt-6 text-[13px] text-[var(--mute)]">Connecting…</p>}
             <div className="lg:hidden mt-6 pt-5 border-t border-[var(--line)]">
               <FollowFadeBar />
             </div>
           </Frame>
 
-          {/* Chime card — appears below WINDOW frame after the bell */}
+          {/* Chime card — rises in below WINDOW after the bell */}
           {cardVisible && chimeState && window && chimeState.marketId === window.marketId && (
-            <ChimeCard
-              window={window}
-              finalUp={chimeState.finalUp}
-              voices={voices}
-              userSide={userSide}
-              userWon={userWon}
-              onDismiss={dismissCard}
-            />
+            <div className="chime-rise" key={chimeState.marketId}>
+              <ChimeCard
+                window={window}
+                finalUp={chimeState.finalUp}
+                voices={voices}
+                userSide={userSide}
+                userWon={userWon}
+                onDismiss={dismissCard}
+              />
+            </div>
           )}
         </div>
 

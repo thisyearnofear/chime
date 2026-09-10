@@ -10,6 +10,8 @@ interface ChimeLandingProps {
   window: LiveWindow | null
   /** The finalUp value from the ?chime= param (0–100 integer) */
   finalUpPct: number
+  /** Compact mode: single next-open line under the price (post-close hook) */
+  compact?: boolean
 }
 
 /**
@@ -17,7 +19,7 @@ interface ChimeLandingProps {
  * Shows the closed window's last probability and counts down to the next open.
  * Dismisses itself when the next window opens (status becomes 1).
  */
-export function ChimeLanding({ window: linkedWindow, finalUpPct }: ChimeLandingProps) {
+export function ChimeLanding({ window: linkedWindow, finalUpPct, compact }: ChimeLandingProps) {
   const catalog = useMarketStore((s) => s.catalog)
   const [now, setNow] = useState(() => Date.now())
   const [dismissed, setDismissed] = useState(false)
@@ -62,6 +64,22 @@ export function ChimeLanding({ window: linkedWindow, finalUpPct }: ChimeLandingP
   const soonestUp = soonest
     ? Math.round(impliedUp(soonest.bestBid, soonest.bestAsk) * 100)
     : null
+
+  // Compact: one retention line under the price — never a tombstone
+  if (compact) {
+    if (nextLive) return null
+    return (
+      <p className="mt-1 text-[11px] text-[var(--mute)]">
+        {waitLeft !== null && waitLeft > 0 ? (
+          <>next opens in <span className="text-[var(--ink)]">{formatCountdown(waitLeft)}</span> — stay to watch it live</>
+        ) : soonest ? (
+          <>{`${soonest.asset} ${formatInterval(soonest.intervalSec)}`} is live now{soonestLeft !== null && soonestLeft < 120 ? ` · ${formatCountdown(soonestLeft)} left` : null}{soonestUp !== null ? ` · ↑${soonestUp}¢` : null}</>
+        ) : (
+          <>checking for the next window…</>
+        )}
+      </p>
+    )
+  }
 
   return (
     <div className="mb-4 border border-[var(--brass)] bg-[var(--paper)] px-4 py-3 relative">

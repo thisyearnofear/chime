@@ -119,10 +119,39 @@ body > * {
   animation: chime-flash 0.9s ease-out 1;
 }
 
+@keyframes chime-numeral {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.chime-numeral {
+  display: inline-block;
+  animation: chime-numeral 0.15s ease-out 1;
+}
+
 .chime-mark {
   display: inline-block;
   transform-origin: left center;
   animation: chime-mark 0.7s ease-out 1;
+}
+
+@keyframes chime-rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chime-rise {
+  animation: chime-rise 0.2s ease-out 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -130,6 +159,12 @@ body > * {
     animation: none;
   }
   .chime-flash {
+    animation: none;
+  }
+  .chime-numeral {
+    animation: none;
+  }
+  .chime-rise {
     animation: none;
   }
 }

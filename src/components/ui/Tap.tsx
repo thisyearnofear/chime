@@ -14,11 +14,11 @@ export const Tap = forwardRef<
       ref={ref}
       disabled={disabled}
       className={cn(
-        'h-11 px-5 text-[13px] font-medium transition-colors disabled:opacity-35 disabled:pointer-events-none',
-        tone === 'brass' && 'bg-[var(--brass)] text-[var(--paper)] hover:brightness-110',
-        tone === 'ghost' && 'text-[var(--ink)] hover:text-[var(--brass)]',
+        'h-11 px-5 text-[13px] font-medium transition-all duration-100 disabled:opacity-35 disabled:pointer-events-none active:scale-[0.98]',
+        tone === 'brass' && 'bg-[var(--brass)] text-[var(--paper)] hover:brightness-110 active:brightness-95',
+        tone === 'ghost' && 'text-[var(--ink)] hover:text-[var(--brass)] active:brightness-125',
         tone === 'line' &&
-          'border border-[var(--line)] text-[var(--ink)] hover:border-[var(--slate)] hover:text-[var(--ink)]',
+          'border border-[var(--line)] text-[var(--ink)] hover:border-[var(--slate)] hover:text-[var(--ink)] active:border-[var(--brass)]',
         className
       )}
       {...props}

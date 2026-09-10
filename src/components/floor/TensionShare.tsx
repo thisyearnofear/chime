@@ -26,7 +26,7 @@ export function TensionShare({ window: win, upPct, secondsLeft }: TensionSharePr
   const countdownStr = formatCountdown(secondsLeft)
 
   const tweetText = [
-    `${cadence} closes in ${countdownStr} — currently ↑${upPct}¢`,
+    `${cadence} · ${countdownStr} left · ↑${upPct}¢`,
     `Watch the last seconds live`,
     `#ChimeIn`,
     url,
@@ -42,8 +42,8 @@ export function TensionShare({ window: win, upPct, secondsLeft }: TensionSharePr
     <button
       type="button"
       onClick={handleShare}
-      className="mt-3 text-[11px] text-[var(--halt)] hover:brightness-125 transition-[filter]"
-      aria-label={`Share: ${cadence} closes in ${countdownStr}`}
+      className="chime-rise mt-4 inline-block text-[11px] text-[var(--halt)] hover:brightness-125 transition-[filter]"
+      aria-label={`Share: ${cadence} · ${countdownStr} left`}
     >
       ↗ share the tension
     </button>

@@ -74,9 +74,11 @@ export function FollowFadeBar() {
         </div>
       )}
       <p className="text-[12px] text-[var(--mute)] mb-3">
-        {followed
-          ? `${followed.label} · ${followed.side} · ${size} ${net.collateralSymbol}`
-          : 'Seats opening…'}
+        {followed ? (
+          `${followed.label} · ${followed.side} · ${size} ${net.collateralSymbol}`
+        ) : (
+          <>Tap a seat to ride — <span className="text-[var(--ink)]">01 / 02 above</span></>
+        )}
       </p>
       <div className="flex gap-3">
         <Tap tone="brass" disabled={pending || locked || !followed} onClick={() => void trade('follow')}>
@@ -86,6 +88,11 @@ export function FollowFadeBar() {
           Fade
         </Tap>
       </div>
+      {!followed && !locked && (
+        <p className="text-[11px] text-[var(--mute)] mt-3">
+          Seats take opposite sides. Your tap picks the default.
+        </p>
+      )}
       {locked && window && !window.demo && (
         <p className="text-[12px] text-[var(--mute)] mt-3">
           {window.status !== 1 ? 'Locked — wait for the next chime' : 'Too close to expiry'}
