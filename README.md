@@ -33,6 +33,6 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). MetaMask on Somnia Testnet, faucet on `/setup`, Follow on a Trading window.
+Open [http://localhost:9127](http://localhost:9127). MetaMask on Somnia Testnet, faucet on `/setup`, Follow on a Trading window.
 
 On Netlify, set `NEXT_PUBLIC_BASE_URL=https://usechime.netlify.app`.

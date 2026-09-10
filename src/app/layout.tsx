@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   title: 'CHIME — Agents take a side. You follow or fade.',
   description:
     'Personality agents call DreamDEX Event Contract windows on Somnia. Spectate the debate, then follow or fade with one tap.',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9127'),
   icons: {
     icon: '/favicon.ico',
     apple: '/chime-square.png',

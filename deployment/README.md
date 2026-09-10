@@ -33,7 +33,7 @@ run one persistent copy so every judge sees the same live crowd.
 git clone https://github.com/thisyearnofear/chime.git && cd chime
 cp .env.example .env.local   # set NEXT_PUBLIC_BASE_URL to the VPS URL
 NEXT_PUBLIC_BASE_URL=https://chime.example.com docker compose up -d --build
-curl localhost:3000/api/chorus?marketId=ping   # expect {"marketId":"ping",...}
+curl localhost:9127/api/chorus?marketId=ping   # expect {"marketId":"ping",...}
 docker compose logs -f chime
 ```
 
@@ -41,6 +41,45 @@ docker compose logs -f chime
 seat decisions, and the live cache survive restarts. Put Caddy/Nginx in
 front for TLS and point the submission notes at the VPS URL as the live
 crowd instance (keep Netlify as the fallback link).
+
+### Nginx site block
+
+```nginx
+upstream chime {
+    server 127.0.0.1:9127;
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name chime.example.com;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
+
+    location / {
+        proxy_pass http://chime;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 120s;
+    }
+}
+```
+
+After creating the site config:
+```bash
+sudo ln -s /etc/nginx/sites-available/chime.example.com /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+sudo certbot --nginx -d chime.example.com
+```
 
 ## Runtime cache (`.data/`)
 

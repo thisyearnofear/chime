@@ -14,7 +14,7 @@ RUN npm run build
 
 FROM base AS run
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=9127
 ENV HOSTNAME=0.0.0.0
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/.next ./.next
@@ -22,5 +22,5 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/next.config.js ./next.config.js
 VOLUME ["/app/.data"]
-EXPOSE 3000
+EXPOSE 9127
 CMD ["npm", "start"]
