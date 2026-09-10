@@ -103,6 +103,22 @@ body > * {
   }
 }
 
+@keyframes chime-flash {
+  0% {
+    opacity: 0.25;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.chime-flash {
+  animation: chime-flash 0.9s ease-out 1;
+}
+
 .chime-mark {
   display: inline-block;
   transform-origin: left center;
@@ -111,6 +127,9 @@ body > * {
 
 @media (prefers-reduced-motion: reduce) {
   .chime-mark {
+    animation: none;
+  }
+  .chime-flash {
     animation: none;
   }
 }

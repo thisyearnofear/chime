@@ -6,6 +6,7 @@ import { useFollowTrade } from '@/hooks/useFollowTrade'
 import { useMarketStore } from '@/stores/marketStore'
 import { useAgentStore } from '@/stores/agentStore'
 import { usePositionStore } from '@/stores/positionStore'
+import { useWallet } from '@/hooks/useWallet'
 import { getMarketNetwork } from '@/lib/markets/config'
 import { sizeForPersonality } from '@/lib/agents/mapping'
 import { formatSide, secondsLeft } from '@/lib/markets/format'
@@ -15,14 +16,28 @@ export function FollowFadeBar() {
   const { defaultSize } = useAgentStore()
   const { trade, pending, followed } = useFollowTrade()
   const stake = usePositionStore((s) => s.events.find((e) => e.type === 'follow' || e.type === 'fade'))
+  const { isConnected } = useWallet()
   const net = getMarketNetwork()
 
   const locked =
     !window || window.demo || window.status !== 1 || secondsLeft(window.expiry) < 15
   const size = followed ? sizeForPersonality(followed.label, defaultSize) : defaultSize
+  const fresh = !isConnected || !stake
 
   return (
     <div>
+      {fresh && (
+        <div className="mb-4 border border-[var(--line)] px-3 py-3">
+          <p className="text-[12px] text-[var(--ink)]">1 Faucet on Setup → 2 Tap a seat → 3 Follow</p>
+          <p className="mt-1 text-[11px] text-[var(--mute)]">Winners claim on Desk. Testnet only, free money.</p>
+          <Link
+            href="/setup"
+            className="mt-3 inline-block h-11 px-5 text-[13px] leading-[2.75rem] bg-[var(--brass)] text-[var(--paper)] hover:brightness-110"
+          >
+            Start
+          </Link>
+        </div>
+      )}
       <p className="text-[12px] text-[var(--mute)] mb-3">
         {followed
           ? `${followed.label} · ${followed.side} · ${size} ${net.collateralSymbol}`

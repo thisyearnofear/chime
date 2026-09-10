@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { Tap } from '@/components/ui/Tap'
 import { Frame } from '@/components/ui/Frame'
 import { Page, PageHead } from '@/components/layout/Page'
@@ -15,6 +16,27 @@ import type { DeskFill, TimelineEvent } from '@/types/markets'
 
 function fillKey(row: { id?: string; txHash?: string; at?: number; title?: string }): string {
   return row.txHash || row.id || `${row.at}-${row.title}`
+}
+
+function ShareFill({ txHash }: { txHash?: string }) {
+  const [copied, setCopied] = useState(false)
+  if (!txHash) return null
+  const base = typeof window !== 'undefined' ? window.location.origin : ''
+  const text = `${base}/dashboard · fill ${txHash}`
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        void navigator.clipboard?.writeText(text).then(() => {
+          setCopied(true)
+          setTimeout(() => setCopied(false), 2000)
+        })
+      }}
+      className="text-[11px] text-[var(--mute)] hover:text-[var(--brass)] mt-1 ml-3 inline-block"
+    >
+      {copied ? 'copied' : 'share fill'}
+    </button>
+  )
 }
 
 export default function DashboardPage() {
@@ -160,14 +182,17 @@ export default function DashboardPage() {
               <p className="text-[var(--ink)]">{row.title}</p>
               {row.detail && <p className="text-[var(--mute)] mt-1">{row.detail}</p>}
               {row.txHash && (
-                <a
-                  href={explorerTx(net.blockExplorer, row.txHash)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-[var(--brass)] mt-1 inline-block"
-                >
-                  {row.txHash.slice(0, 10)}…
-                </a>
+                <>
+                  <a
+                    href={explorerTx(net.blockExplorer, row.txHash)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[var(--brass)] mt-1 inline-block"
+                  >
+                    {row.txHash.slice(0, 10)}…
+                  </a>
+                  <ShareFill txHash={row.txHash} />
+                </>
               )}
             </li>
           ))}

@@ -19,6 +19,10 @@ export function demoWindow(asset: Asset, intervalSec: IntervalSec): LiveWindow {
   }
 }
 
+// Demo-safe book: judges can load /?demo=1 (or any demo window) and the floor
+// renders a live-looking book + spark without a wallet or faucet. Follow on a
+// demo window is intercepted in useFollowTrade and simulated — never on-chain.
+
 export function demoDecision(window: LiveWindow): WindowDecision {
   const [a, b] = seatsForWindow(window.marketId, window.asset, window.intervalSec)
   const sideA = heuristicSide(a, window.bestBid, window.bestAsk)

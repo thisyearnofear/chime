@@ -19,7 +19,7 @@ Read `design.md` at the repo root first. Change **one or two variables** per pas
 
 ## Do not ship
 
-Purple wash, glass/frost/blur theater, magnets, ping, shimmer, float, sparkle buttons, gradient pills, Space Grotesk, Five-item primary nav, empty 50/50 rails, candlesticks, chat, Three.js, GSAP scroll stories, shader cursor trails, section kickers, emoji as the visual system.
+Purple wash, glass/frost/blur theater, magnets, ping, shimmer, float, sparkle buttons, gradient pills, Space Grotesk, empty 50/50 rails, candlesticks, chat, Three.js, GSAP scroll stories, shader cursor trails, section kickers, emoji as the visual system.
 
 ## Pass rule
 

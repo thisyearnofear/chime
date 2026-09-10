@@ -59,6 +59,7 @@ export function WindowClock({ window, upProbability, locked, compact }: WindowCl
       height={compact ? 'min(56vw, 220px)' : 'min(72vw, 300px)'}
       role="img"
       aria-label={done ? 'Window closed' : `${display} remaining`}
+      className={done && !locked ? 'chime-flash' : undefined}
     >
       <circle cx={cx} cy={cy} r={r + 12} fill="none" stroke="var(--line)" strokeWidth="1" />
       {Array.from({ length: 12 }, (_, i) => {

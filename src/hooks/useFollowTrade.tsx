@@ -32,6 +32,44 @@ export function useFollowTrade() {
 
   const trade = useCallback(async (intent: 'follow' | 'fade') => {
     if (!window || !followed) return
+
+    const side: Side = intent === 'follow' ? followed.side : followed.side === 'up' ? 'down' : 'up'
+    const size = sizeForPersonality(followed.label, defaultSize)
+
+    // Demo-safe mode: simulate the fill locally so judges can film the loop
+    // with no wallet, no faucet, no chain. Labelled DEMO everywhere.
+    if (window.demo) {
+      const txHash = `demo-${Date.now().toString(36)}`
+      setLastTxHash(txHash)
+      pushEvent({
+        id: txHash,
+        type: intent,
+        at: Date.now(),
+        title: `${intent === 'follow' ? 'Followed' : 'Faded'} ${followed.label} (demo)`,
+        detail: `${size} ${net.collateralSymbol}`,
+        side,
+        txHash,
+        marketId: window.marketId,
+      })
+      const id = addToast({
+        type: 'success',
+        duration: 8000,
+        message: (
+          <>
+            Demo fill {formatSide(side)} · {size} {net.collateralSymbol}.{' '}
+            <Link
+              href="/dashboard"
+              onClick={() => removeToast(id)}
+              className="text-[var(--brass)] hover:underline"
+            >
+              See Desk →
+            </Link>
+          </>
+        ),
+      })
+      return
+    }
+
     if (!isConnected) {
       await connect()
       return
@@ -41,8 +79,6 @@ export function useFollowTrade() {
       return
     }
 
-    const side: Side = intent === 'follow' ? followed.side : followed.side === 'up' ? 'down' : 'up'
-    const size = sizeForPersonality(followed.label, defaultSize)
     setPending(true)
     try {
       await rebind()

@@ -9,13 +9,13 @@ import { cn } from '@/lib/utils'
 const PRIMARY = [
   { href: '/', label: 'Floor' },
   { href: '/watch', label: 'Watch' },
+  { href: '/dashboard', label: 'Desk' },
 ]
 
 const MORE = [
   { href: '/setup', label: 'Setup' },
-  { href: '/dashboard', label: 'Desk' },
   { href: '/roster', label: 'Roster' },
-  { href: '/help', label: 'Glossary' },
+  { href: '/help', label: 'How it works' },
 ]
 
 function MoreMenu({ pathname }: { pathname: string }) {

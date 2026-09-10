@@ -5,6 +5,7 @@ import type { Asset, IntervalSec, LiveWindow, MidSample, Series, TapeRow } from 
 const MAX_MIDS = 40
 const MAX_TAPE = 6
 const PRINT_DELTA = 0.005
+const TAPE_KEY = 'chime:tape'
 
 interface MarketState {
   series: Series | null
@@ -32,6 +33,27 @@ export function seriesFromSearch(asset?: string | null, window?: string | null):
   return { asset: a, intervalSec }
 }
 
+function readStoredTape(): TapeRow[] {
+  if (typeof window === 'undefined') return []
+  try {
+    const raw = localStorage.getItem(TAPE_KEY)
+    if (!raw) return []
+    const parsed = JSON.parse(raw) as TapeRow[]
+    return Array.isArray(parsed) ? parsed.slice(0, MAX_TAPE) : []
+  } catch {
+    return []
+  }
+}
+
+function writeStoredTape(tape: TapeRow[]): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(TAPE_KEY, JSON.stringify(tape.slice(0, MAX_TAPE)))
+  } catch {
+    /* quota */
+  }
+}
+
 function withBookSample(
   state: Pick<MarketState, 'floorMarketId' | 'mids' | 'tape'>,
   window: LiveWindow | null
@@ -39,7 +61,7 @@ function withBookSample(
   const id = window?.marketId ?? null
   const reset = id !== state.floorMarketId
   let mids = reset ? [] : state.mids
-  let tape = reset ? [] : state.tape
+  let tape = reset ? readStoredTape() : state.tape
   const hasBook = Boolean(window && (window.bestBid != null || window.bestAsk != null))
   if (!window || !hasBook) {
     return { floorMarketId: id, mids, tape }
@@ -66,6 +88,7 @@ function withBookSample(
       },
       ...tape,
     ].slice(0, MAX_TAPE)
+    writeStoredTape(tape)
   }
   return { floorMarketId: id, mids, tape }
 }

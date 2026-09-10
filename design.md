@@ -34,8 +34,8 @@ One accent. Down is pewter, not violet.
 
 ## Layout
 
-- Slim top rail: CHIME · Floor Watch More · wallet. Solid paper, no blur.
-- More holds Setup, Desk, Roster
+- Slim top rail: CHIME · Floor Watch Desk More · wallet. Solid paper, no blur.
+- More holds Setup, Roster, How it works (`/help`)
 - Shared shell: `Page` — `max-w-6xl`, `--gap` 16px, `--pad` 20px. Watch/Setup/Desk/Roster snap to the same left edge as Floor
 - Floor is two framed panels: WINDOW left, PIT right, `gap-[var(--gap)]`
 - Each frame has inset rules and brass corner ticks (`--tick` 8px)
