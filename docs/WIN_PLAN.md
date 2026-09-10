@@ -122,5 +122,13 @@ This plan closes the UX / ecosystem / demo gaps without breaking `design.md`.
   ChimeCard/ChimeLanding/TensionShare/WindowStory/dynamicLine/?ride=/Watch/
   Roster-share/Demo-mode; README loops cover demo mode, ?ride= share, and
   the close-as-social-moment.
-- Remaining: demo video, winning claim on camera, Bot Kit agent,
-  final verify, submit.
+- 2026-09-11: UX clarity + review fixes shipped (price line, ladder order,
+  gated Follow/Fade, sticky bar, summary ledger, ritual dots, streak rank;
+  then sticky/countdown/deep-link/scroll/ledger/glossary fixes).
+- 2026-09-11: VPS judging backend committed (Dockerfile, docker-compose.yml
+  with chime-data volume, .dockerignore, deployment runbook). Unvalidated —
+  no Docker on this machine; build on the VPS before pointing notes at it.
+  Demo-clip re-verified live (2 Up · 1 Down round-trips).
+- Remaining: demo video (script locked, clip verified — film it), winning
+  claim on camera (`npm run prove:loop`, key present in .env.local),
+  Bot Kit agent (credentials pending), final verify, submit.
