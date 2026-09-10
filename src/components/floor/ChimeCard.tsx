@@ -14,16 +14,16 @@ interface ChimeCardProps {
 }
 
 /**
- * Builds a ?chime= deep-link that drops the recipient onto the exact window
- * that just closed: /?asset=BTC&window=15m&chime=1
- * The `chime=1` param is a hint to the Floor to highlight the closed state.
+ * Builds a ?chime=NN deep-link encoding the final Up probability (0–100)
+ * so recipients see the result and land on the right window.
+ * Format: /?asset=BTC&window=15m&chime=67
  */
-function buildChimeUrl(win: LiveWindow): string {
+function buildChimeUrl(win: LiveWindow, finalUpPct: number): string {
   const origin = typeof window !== 'undefined' ? globalThis.location.origin : 'https://chime.floor'
   const params = new URLSearchParams({
     asset: win.asset,
     window: formatInterval(win.intervalSec),
-    chime: '1',
+    chime: String(finalUpPct),
   })
   return `${origin}/?${params.toString()}`
 }
@@ -54,8 +54,8 @@ export function ChimeCard({ window: win, finalUp, voices, userSide, userWon, onD
 
   const voiceLabel = voices === 1 ? '1 voice chimed in' : `${voices} voices chimed in`
 
-  // Deep-link URL: lands on the exact closed window
-  const chimeUrl = buildChimeUrl(win)
+  // Deep-link URL: lands on the exact closed window, encodes final probability
+  const chimeUrl = buildChimeUrl(win, upPct)
 
   // Tweet text — URL goes at the end so Twitter's t.co shortener wraps it
   const tweetText = [

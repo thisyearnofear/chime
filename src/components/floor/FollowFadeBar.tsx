@@ -25,7 +25,7 @@ export function FollowFadeBar() {
   const fresh = !isConnected || !stake
 
   return (
-    <div>
+    <div id="follow-fade">
       {fresh && (
         <div className="mb-4 border border-[var(--line)] px-3 py-3">
           <p className="text-[12px] text-[var(--ink)]">1 Faucet on Setup → 2 Tap a seat → 3 Follow</p>
