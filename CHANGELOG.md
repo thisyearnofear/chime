@@ -18,10 +18,12 @@ Proved all three loops against the live DreamDEX venue (`0x679795a0…`) with
     as designed. Both fills later appeared in `getPortfolio` trades.
 - **Claim (correct zero on losers)** — the 15:15Z window finalized Down
   (`winningOutcome 1`) while the ticket held YES; `redeemHeld` read both
-  balances and skipped the zero winning-side balance. The older `…16d3a`
-  NO ticket likewise lost (winner 0/Up). `claimScan` swept 21 markets, paid 0 —
-  the right answer for two losing tickets. A winning redemption (payout tx)
-  is still unproven; it needs a ticket on the winning side.
+  balances and skipped the zero winning-side balance. Same verdict on the
+  15:25Z window: finalized Down (`win=1`), held `YES=5000000 NO=0`, winner's
+  side empty — nothing to redeem. The older `…16d3a` NO ticket likewise lost
+  (winner 0/Up). `claimScan` swept 21 markets, paid 0 — the right answer for
+  three losing tickets. A winning redemption (payout tx) is still unproven;
+  it needs a ticket on the winning side.
 - **Stale-cache note** — `.data/chime-live.json` still held Sept-8 rows until a
   fresh `/api/markets/live` hit. `stillOpen()` filters expired rows on read
   and the file rewrites on refresh, so the Floor self-heals. Reload `/` after
