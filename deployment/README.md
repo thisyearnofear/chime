@@ -22,11 +22,16 @@ NEXT_PUBLIC_BASE_URL=https://usechime.netlify.app
 
 Optional server-only: `VENICE_API_KEY`, `FEATHERLESS_API_KEY`.
 
-## VPS (judging-period backend)
+## Architecture
+
+```
+chime.trustfall.xyz   →  Netlify (static frontend, CDN)
+api.chime.trustfall.xyz → VPS (Next.js API, persistent chorus)
+```
 
 The chorus aggregate (`/api/chorus` → `.data/chime-chorus.json`) is
 file-backed, so on Netlify it resets per deploy/region. During judging,
-run one persistent copy so every judge sees the same live crowd.
+run one persistent copy on the VPS so every judge sees the same live crowd.
 
 ### Deploy (rsync + PM2)
 
@@ -61,18 +66,33 @@ Set env vars in `/opt/chime/shared/.env` (loaded by PM2) or pass via
 
 ```
 NEXT_PUBLIC_NETWORK=testnet
-NEXT_PUBLIC_BASE_URL=https://chime.trustfall.xyz
+NEXT_PUBLIC_BASE_URL=https://api.chime.trustfall.xyz
 ```
+
+The frontend (`chime.trustfall.xyz` on Netlify) calls the backend
+(`api.chime.trustfall.xyz`) via CORS — headers are configured in
+`next.config.js`.
 
 `ecosystem.config.cjs` mounts a named volume at `/app/.data`, so tallies,
 seat decisions, and the live cache survive restarts. Put Caddy/Nginx in
 front for TLS and point the submission notes at the VPS URL as the live
 crowd instance (keep Netlify as the fallback link).
 
+### DNS setup
+
+From your GoDaddy DNS panel for `trustfall.xyz`:
+
+| Type | Name | Value | TTL |
+|---|---|---|---|
+| A | `chime` | `157.180.36.156` | Auto |
+| A | `api.chime` | `157.180.36.156` | Auto |
+
+Note the nested subdomain: `api.chime` creates `api.chime.trustfall.xyz`.
+
 ### Nginx site block
 
 ```nginx
-upstream chime {
+upstream chime_api {
     server 127.0.0.1:9127;
     keepalive 32;
 }
@@ -80,14 +100,14 @@ upstream chime {
 server {
     listen 80;
     listen [::]:80;
-    server_name chime.example.com;
+    server_name api.chime.trustfall.xyz;
 
     location /.well-known/acme-challenge/ {
         root /var/www/html;
     }
 
     location / {
-        proxy_pass http://chime;
+        proxy_pass http://chime_api;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -103,9 +123,9 @@ server {
 
 After creating the site config:
 ```bash
-sudo ln -s /etc/nginx/sites-available/chime.example.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/api.chime.trustfall.xyz /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d chime.example.com
+sudo certbot --nginx -d api.chime.trustfall.xyz
 ```
 
 ### Directory layout on VPS

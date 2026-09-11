@@ -20,7 +20,8 @@ module.exports = {
         PORT: 9127,
         HOSTNAME: '127.0.0.1',
         NEXT_PUBLIC_NETWORK: 'testnet',
-        NEXT_PUBLIC_BASE_URL: 'https://chime.trustfall.xyz',
+        // Backend URL — separate from frontend (Netlify)
+        NEXT_PUBLIC_BASE_URL: 'https://api.chime.trustfall.xyz',
         VENICE_API_KEY: '',
         FEATHERLESS_API_KEY: '',
       },
