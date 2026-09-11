@@ -11,6 +11,7 @@ import { FollowFadeBar } from './FollowFadeBar'
 import { SeriesSwitcher } from './SeriesSwitcher'
 import { ChimeCard } from './ChimeCard'
 import { ChimeLanding, RitualDots } from './ChimeLanding'
+import { OnboardHint } from './OnboardHint'
 import { TensionShare } from './TensionShare'
 import { WindowStory } from './WindowStory'
 import { Frame } from '@/components/ui/Frame'
@@ -177,6 +178,9 @@ export function Floor() {
         <ChimeLanding window={window} finalUpPct={landingFinalPct} />
       )}
 
+      {/* First-time onboarding — dismissed after first chime or manual close */}
+      {!showLanding && !arrivedViaChime && <OnboardHint />}
+
       {/* Post-close hook: every close (not just ?chime=) counts down to next open */}
       {!showLanding && cardVisible && chimeState && window && chimeState.marketId === window.marketId && (
         <ChimeLanding window={window} finalUpPct={Math.round(chimeState.finalUp * 100)} compact />
@@ -226,7 +230,10 @@ export function Floor() {
               )}
             </p>
 
-            <p className="mt-3 text-[15px] text-[var(--ink)]">Two seats. One window. Chime in.</p>
+            <p className="mt-3 text-[15px] text-[var(--ink)]">
+              Two AI agents take opposite sides on a BTC or ETH window.
+              Tap to chime free — then follow or fade with a stake.
+            </p>
             <RitualDots chimed={hasChimed} staked={hasStaked} claimed={hasClaimed} />
 
             {/* Voices — zero-state recruits, count reports, 3+ is a CTA */}
@@ -236,7 +243,7 @@ export function Floor() {
                 onClick={scrollToFollowFade}
                 className="chime-rise mt-3 text-[11px] text-left text-[var(--mute)] hover:text-[var(--brass)] transition-colors"
               >
-                Be the first voice — <span className="underline underline-offset-2">chime in free</span>
+                Be the first voice — <span className="underline underline-offset-2">chime in free (no wallet)</span>
               </button>
             ) : voices >= 3 ? (
               <button
@@ -246,12 +253,13 @@ export function Floor() {
               >
                 <span className="text-[var(--brass)]">{voices}</span>
                 {' traders chimed in — '}
-                <span className="underline underline-offset-2">join them</span>
+                <span className="underline underline-offset-2">join them (free)</span>
               </button>
             ) : (
               <p className="mt-3 text-[11px] text-[var(--mute)]">
                 <span className="text-[var(--brass)]">{voices}</span>
-                {voices === 1 ? ' voice' : ' voices'} chimed in
+                {voices === 1 ? ' voice' : ' voices'} chimed in{' '}
+                <span className="text-[var(--mute)]/70">(free, no wallet)</span>
               </p>
             )}
 
