@@ -4,6 +4,7 @@ const nextConfig = {
     unoptimized: true,
   },
   turbopack: {},
+  output: 'standalone',
   transpilePackages: ['@somnia-chain/markets-sdk'],
   serverExternalPackages: ['ws', 'bufferutil'],
   async redirects() {
