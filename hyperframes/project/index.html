@@ -3,8 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1920, height=1080" />
-    <title>CHIME Demo — Hackathon Submission</title>
+    <title>CHIME Demo — fondof Style</title>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/TextPlugin.min.js"></script>
+    <!-- Audio tracks -->
+    <audio id="voiceover" src="audio/voiceover.mp3" data-start="0" data-duration="33" data-volume="0.8" preload="auto"></audio>
+    <audio id="bgm" src="audio/bgm.mp3" data-start="0" data-duration="33" data-volume="0.3" preload="auto"></audio>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -41,194 +45,198 @@
         padding: 80px;
       }
       
-      /* Typography */
+      /* Typography — fondof style */
       h1 {
         font-family: 'Newsreader', serif;
-        font-size: 72px;
-        font-weight: 500;
-        line-height: 1.1;
-        letter-spacing: -0.02em;
+        font-size: 140px;
+        font-weight: 600;
+        line-height: 1;
+        letter-spacing: -0.03em;
       }
       h2 {
         font-family: 'Newsreader', serif;
-        font-size: 48px;
+        font-size: 72px;
         font-weight: 500;
         line-height: 1.2;
       }
       p {
-        font-size: 28px;
-        line-height: 1.6;
+        font-size: 32px;
+        line-height: 1.5;
         color: var(--mute);
       }
       .mono {
         font-family: 'JetBrains Mono', monospace;
-        font-size: 24px;
+        font-size: 18px;
         color: var(--brass);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
       }
       .large {
-        font-size: 120px;
+        font-size: 160px;
         font-weight: 600;
         color: var(--brass);
         font-family: 'Newsreader', serif;
+        line-height: 1;
+      }
+      .cascade-word {
+        display: inline-block;
+        opacity: 0;
+        margin-right: 0.25em;
       }
       
-      /* UI mock elements */
+      /* UI elements */
       .card {
         background: var(--paper);
         border: 2px solid var(--line);
         border-radius: 16px;
-        padding: 40px;
+        padding: 48px;
         position: relative;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
       }
       .card::before, .card::after {
         content: '';
         position: absolute;
-        width: 24px;
-        height: 24px;
-        border: 2px solid var(--brass);
+        width: 32px;
+        height: 32px;
+        border: 3px solid var(--brass);
       }
       .card::before {
-        top: -1px;
-        left: -1px;
-        border-right: none;
-        border-bottom: none;
+        top: -1px; left: -1px;
+        border-right: none; border-bottom: none;
         border-radius: 16px 0 0 0;
       }
       .card::after {
-        bottom: -1px;
-        right: -1px;
-        border-left: none;
-        border-top: none;
+        bottom: -1px; right: -1px;
+        border-left: none; border-top: none;
         border-radius: 0 0 16px 0;
       }
       
       .badge {
         display: inline-block;
-        padding: 8px 16px;
+        padding: 10px 20px;
         background: var(--line);
         border-radius: 8px;
-        font-size: 18px;
+        font-size: 20px;
         color: var(--brass);
         font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
       
       .divider {
         width: 100%;
         height: 2px;
         background: var(--line);
-        margin: 40px 0;
+        margin: 48px 0;
       }
       
-      /* Clock face mock */
+      /* Clock */
       .clock {
-        width: 400px;
-        height: 400px;
-        border: 4px solid var(--brass);
+        width: 480px;
+        height: 480px;
+        border: 5px solid var(--brass);
         border-radius: 50%;
         position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
-      }
-      .clock::before {
-        content: '';
-        position: absolute;
-        width: 8px;
-        height: 8px;
-        background: var(--brass);
-        border-radius: 50%;
+        box-shadow: 0 0 80px rgba(196, 161, 90, 0.2);
       }
       .clock-hand {
         position: absolute;
         bottom: 50%;
         left: 50%;
-        width: 4px;
-        height: 160px;
+        width: 5px;
+        height: 180px;
         background: var(--brass);
         transform-origin: bottom center;
-        transform: translateX(-50%) rotate(0deg);
+        transform: translateX(-50%);
       }
       .clock-numeral {
         position: absolute;
-        font-size: 32px;
+        font-size: 36px;
         font-weight: 600;
         color: var(--ink);
       }
       
-      /* Seat mock */
+      /* Seat */
       .seat {
         display: flex;
         align-items: center;
-        gap: 24px;
-        padding: 32px;
+        gap: 32px;
+        padding: 40px;
         background: var(--line);
-        border-radius: 12px;
-        margin: 16px 0;
+        border-radius: 16px;
+        margin: 20px 0;
+        border: 2px solid transparent;
+      }
+      .seat.followed {
+        border-color: var(--brass);
+        box-shadow: 0 0 40px rgba(196, 161, 90, 0.3);
       }
       .seat-avatar {
-        width: 64px;
-        height: 64px;
+        width: 80px;
+        height: 80px;
         border-radius: 50%;
         background: var(--brass);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 28px;
+        font-size: 36px;
         font-weight: 600;
         color: var(--paper);
       }
-      .seat-info {
-        flex: 1;
-      }
+      .seat-info { flex: 1; }
       .seat-name {
-        font-size: 24px;
+        font-size: 32px;
         font-weight: 500;
         color: var(--ink);
       }
       .seat-side {
-        font-size: 18px;
+        font-size: 22px;
         color: var(--brass);
-        margin-top: 4px;
+        margin-top: 8px;
       }
       
       /* Buttons */
       .btn {
         display: inline-flex;
         align-items: center;
-        gap: 12px;
-        padding: 20px 40px;
+        gap: 16px;
+        padding: 28px 56px;
         background: var(--brass);
         color: var(--paper);
         border: none;
-        border-radius: 12px;
-        font-size: 24px;
+        border-radius: 16px;
+        font-size: 28px;
         font-weight: 600;
         font-family: 'JetBrains Mono', monospace;
         cursor: pointer;
-        transition: all 0.2s;
+        box-shadow: 0 8px 32px rgba(196, 161, 90, 0.4);
       }
       .btn-outline {
         background: transparent;
-        border: 2px solid var(--brass);
+        border: 3px solid var(--brass);
         color: var(--brass);
+        box-shadow: none;
       }
       
       /* Tape */
       .tape {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-        max-height: 300px;
+        gap: 16px;
+        max-height: 360px;
         overflow: hidden;
       }
       .tape-row {
         display: flex;
         align-items: center;
-        gap: 16px;
-        padding: 16px 24px;
+        gap: 20px;
+        padding: 20px 32px;
         background: var(--line);
-        border-radius: 8px;
-        font-size: 18px;
+        border-radius: 12px;
+        font-size: 22px;
       }
       .tape-up { color: var(--brass); }
       .tape-down { color: var(--slate); }
@@ -236,56 +244,94 @@
       /* ChimeCard */
       .chime-card {
         background: var(--paper);
-        border: 2px solid var(--brass);
-        border-radius: 24px;
-        padding: 60px;
+        border: 3px solid var(--brass);
+        border-radius: 32px;
+        padding: 80px;
         text-align: center;
         position: relative;
+        box-shadow: 0 40px 120px rgba(0,0,0,0.6);
       }
       .chime-card::before, .chime-card::after {
         content: '';
         position: absolute;
-        width: 32px;
-        height: 32px;
-        border: 3px solid var(--brass);
+        width: 48px;
+        height: 48px;
+        border: 4px solid var(--brass);
       }
       .chime-card::before {
-        top: -1px;
-        left: -1px;
-        border-right: none;
-        border-bottom: none;
-        border-radius: 24px 0 0 0;
+        top: -1px; left: -1px;
+        border-right: none; border-bottom: none;
+        border-radius: 32px 0 0 0;
       }
       .chime-card::after {
-        bottom: -1px;
-        right: -1px;
-        border-left: none;
-        border-top: none;
-        border-radius: 0 0 24px 0;
+        bottom: -1px; right: -1px;
+        border-left: none; border-top: none;
+        border-radius: 0 0 32px 0;
       }
       
-      /* Progress bars */
+      /* Progress */
       .progress-bar {
         width: 100%;
-        height: 8px;
+        height: 12px;
         background: var(--line);
-        border-radius: 4px;
+        border-radius: 6px;
         overflow: hidden;
-        margin: 16px 0;
+        margin: 24px 0;
       }
       .progress-fill {
         height: 100%;
         background: var(--brass);
-        border-radius: 4px;
-        transition: width 0.3s;
+        border-radius: 6px;
       }
       
       /* Voice count */
       .voice-count {
-        font-size: 96px;
+        font-size: 120px;
         font-weight: 600;
         color: var(--brass);
         font-family: 'Newsreader', serif;
+        line-height: 1;
+      }
+      
+      /* Scrollable tape for bottom fill */
+      .scroll-tape {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 280px;
+        overflow: hidden;
+      }
+      .scroll-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 24px;
+        background: var(--line);
+        border-radius: 10px;
+        font-size: 20px;
+        white-space: nowrap;
+      }
+      
+      /* Pulse ring behind counters */
+      .pulse-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 180px;
+        height: 180px;
+        border: 3px solid var(--brass);
+        border-radius: 50%;
+        opacity: 0;
+      }
+      
+      /* Gradient mesh background */
+      #bg-mesh {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse at 20% 80%, rgba(196,161,90,0.08) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 20%, rgba(125,132,124,0.06) 0%, transparent 50%);
+        pointer-events: none;
       }
       
       /* Utility */
@@ -297,60 +343,82 @@
       .gap-4 { gap: 16px; }
       .gap-8 { gap: 32px; }
       .gap-12 { gap: 48px; }
+      .gap-16 { gap: 64px; }
       .mt-8 { margin-top: 32px; }
       .mt-12 { margin-top: 48px; }
+      .mt-16 { margin-top: 64px; }
       .mb-8 { margin-bottom: 32px; }
+      .mb-12 { margin-bottom: 48px; }
       .text-center { text-align: center; }
       .text-brass { color: var(--brass); }
       .text-mute { color: var(--mute); }
       .text-ink { color: var(--ink); }
       .text-halt { color: var(--halt); }
+      .text-slate { color: var(--slate); }
+      .w-full { width: 100%; }
+      .flex-1 { flex: 1; }
+      .min-h-0 { min-height: 0; }
+      .ml-auto { margin-left: auto; }
+      .font-medium { font-weight: 500; }
+      .text-48 { font-size: 48px; }
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-width="1920" data-height="1080" data-duration="150">
+    <div id="root" data-composition-id="fondof-demo" data-width="1920" data-height="1080" data-duration="33">
+      <!-- Shared gradient mesh background -->
+      <div id="bg-mesh"></div>
       
-      <!-- CLIP 1: Hook (0-10s) -->
-      <section id="scene-hook" class="clip" data-start="0" data-duration="10">
-        <div class="flex flex-col items-center justify-center h-full text-center">
-          <p class="mono mb-8 opacity-0">SOMNIA × DREAMDEX HACKATHON</p>
-          <h1 class="opacity-0">Chime is the only prediction market</h1>
-          <h2 class="mt-8 opacity-0 text-brass">where the close is a social moment.</h2>
+      <!-- SCENE 1: Hook Stamp (0–3s) -->
+      <section id="scene-hook" class="clip" data-start="0" data-duration="3">
+        <div class="flex flex-col items-center justify-center h-full text-center" style="padding-top: 0;">
+          <p class="mono mb-8" id="eye-brow" style="opacity: 0;">SOMNIA × DREAMDEX HACKATHON</p>
+          <h1 id="hero-title" style="opacity: 0; font-size: 120px;">Chime</h1>
+          <div class="mt-8" id="cascade-container">
+            <span class="cascade-word">The</span>
+            <span class="cascade-word">close</span>
+            <span class="cascade-word">is</span>
+            <span class="cascade-word">a</span>
+            <span class="cascade-word" style="color: var(--brass);">social</span>
+            <span class="cascade-word">moment.</span>
+          </div>
+          <p class="mt-12 text-brass font-medium" id="hero-url" style="opacity: 0; font-size: 24px;">
+            www.chime.trustfall.xyz
+          </p>
         </div>
       </section>
       
-      <!-- CLIP 2: The Window (10-25s) -->
-      <section id="scene-window" class="clip" data-start="10" data-duration="15">
-        <div class="flex gap-12 items-center">
+      <!-- SCENE 2: Window Snap (3–7s) -->
+      <section id="scene-window" class="clip" data-start="3" data-duration="4">
+        <div class="flex gap-16 items-center">
           <div class="flex-1">
             <div class="card">
-              <div class="flex justify-between items-center mb-8">
+              <div class="flex justify-between items-center mb-12">
                 <span class="badge">WINDOW</span>
                 <span class="mono text-halt">LIVE · 0:42</span>
               </div>
-              <div class="clock" id="clock1">
+              <div class="clock" id="clock1" style="opacity: 0; transform: rotateX(-90deg);">
                 <div class="clock-hand" id="clock-hand1"></div>
-                <span class="clock-numeral" style="top: 20px; left: 50%; transform: translateX(-50%);">12</span>
-                <span class="clock-numeral" style="right: 20px; top: 50%; transform: translateY(-50%);">3</span>
-                <span class="clock-numeral" style="bottom: 20px; left: 50%; transform: translateX(-50%);">6</span>
-                <span class="clock-numeral" style="left: 20px; top: 50%; transform: translateY(-50%);">9</span>
+                <span class="clock-numeral" style="top: 24px; left: 50%; transform: translateX(-50%);">12</span>
+                <span class="clock-numeral" style="right: 24px; top: 50%; transform: translateY(-50%);">3</span>
+                <span class="clock-numeral" style="bottom: 24px; left: 50%; transform: translateX(-50%);">6</span>
+                <span class="clock-numeral" style="left: 24px; top: 50%; transform: translateY(-50%);">9</span>
               </div>
-              <div class="mt-8 text-center">
+              <div class="mt-12 text-center">
                 <span class="large" id="price1">↑52¢</span>
                 <p class="mt-4 text-mute">BTC · 15m window</p>
               </div>
             </div>
           </div>
           <div class="flex-1">
-            <p class="text-ink mb-8">Two AI agents take opposite sides on a BTC or ETH window. The clock ticks. The book fills. The tension builds.</p>
-            <div class="seat">
+            <p class="text-ink mb-12">Two AI agents take opposite sides on a BTC or ETH window. The clock ticks. The book fills. The tension builds.</p>
+            <div class="seat" id="seat-sage" style="opacity: 0; transform: rotateY(90deg);">
               <div class="seat-avatar">A</div>
               <div class="seat-info">
                 <div class="seat-name">Sage</div>
                 <div class="seat-side">↑ Up · 58¢</div>
               </div>
             </div>
-            <div class="seat">
+            <div class="seat" id="seat-rogue" style="opacity: 0; transform: rotateY(90deg);">
               <div class="seat-avatar" style="background: var(--slate);">B</div>
               <div class="seat-info">
                 <div class="seat-name">Rogue</div>
@@ -361,96 +429,126 @@
         </div>
       </section>
       
-      <!-- CLIP 3: Chime Free (25-40s) -->
-      <section id="scene-chime" class="clip" data-start="25" data-duration="15">
-        <div class="flex gap-12 items-center">
-          <div class="flex-1">
-            <p class="text-ink mb-8">Tap to chime free — no wallet, no stake. Just a take. A two-tone ping rings out and your voice joins the chorus.</p>
-            <div class="flex gap-8">
-              <button class="btn" id="chime-up">↑ CHIME UP</button>
-              <button class="btn btn-outline" id="chime-down">↓ CHIME DOWN</button>
-            </div>
-            <div class="mt-8">
-              <p class="text-mute">Free · No wallet needed</p>
-            </div>
-          </div>
-          <div class="flex-1">
-            <div class="card">
-              <div class="flex justify-between items-center mb-8">
-                <span class="badge">CHORUS</span>
-                <span class="mono">crowd vs book</span>
-              </div>
-              <div class="flex items-center gap-12 mb-8">
-                <div class="text-center">
-                  <div class="voice-count" id="up-count">0</div>
-                  <p class="text-brass mt-4">UP</p>
-                </div>
-                <div class="text-center">
-                  <div class="voice-count" id="down-count">0</div>
-                  <p class="text-mute" id="down-label">DOWN</p>
-                </div>
-              </div>
-              <div class="progress-bar">
-                <div class="progress-fill" id="chorus-bar" style="width: 50%;"></div>
-              </div>
-              <p class="mt-8 text-center text-mute" id="chorus-lean">Crowd leans Up</p>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      <!-- CLIP 4: Follow/Fade (40-55s) -->
-      <section id="scene-stake" class="clip" data-start="40" data-duration="15">
-        <div class="flex gap-12 items-center">
-          <div class="flex-1">
-            <p class="text-ink mb-8">When you're ready, follow or fade with a stake. One tap, instant IOC fill. Your side is locked in.</p>
-            <div class="flex gap-8">
-              <button class="btn" id="follow-btn">FOLLOW sage ↑</button>
-              <button class="btn btn-outline" id="fade-btn">FADE ↓</button>
-            </div>
-            <div class="mt-8">
-              <p class="text-mute">Stake tUSDC · One tap fill</p>
-            </div>
-          </div>
-          <div class="flex-1">
-            <div class="card">
-              <div class="flex justify-between items-center mb-8">
-                <span class="badge">PIT</span>
-                <span class="mono">01 / 02</span>
-              </div>
-              <div class="seat" style="border: 2px solid var(--brass);">
-                <div class="seat-avatar">A</div>
-                <div class="seat-info">
-                  <div class="seat-name">Sage</div>
-                  <div class="seat-side">↑ Up · 58¢</div>
-                </div>
-                <span class="badge">FOLLOWED</span>
-              </div>
-              <div class="seat">
-                <div class="seat-avatar" style="background: var(--slate);">B</div>
-                <div class="seat-info">
-                  <div class="seat-name">Rogue</div>
-                  <div class="seat-side">↓ Down · 42¢</div>
-                </div>
+      <!-- SCENE 3: Chime Pop (7–11s) -->
+      <section id="scene-chime" class="clip" data-start="7" data-duration="4">
+        <div class="flex flex-col h-full">
+          <div class="flex gap-16 items-center mb-12">
+            <div class="flex-1">
+              <p class="text-ink mb-12">Tap to chime free — no wallet, no stake. Just a take. A two-tone ping rings out and your voice joins the chorus.</p>
+              <div class="flex gap-12">
+                <button class="btn" id="chime-up" style="opacity: 0;">↑ CHIME UP</button>
+                <button class="btn btn-outline" id="chime-down" style="opacity: 0;">↓ CHIME DOWN</button>
               </div>
               <div class="mt-8">
-                <p class="text-mute">Allegiance: <span class="text-brass">Sage</span></p>
-                <p class="text-mute">Size: <span class="text-brass">5 tUSDC</span></p>
+                <p class="text-mute">Free · No wallet needed</p>
               </div>
+            </div>
+            <div class="flex-1">
+              <div class="card" style="position: relative;">
+                <div class="pulse-ring" id="pulse-1"></div>
+                <div class="flex justify-between items-center mb-12">
+                  <span class="badge">CHORUS</span>
+                  <span class="mono">crowd vs book</span>
+                </div>
+                <div class="flex items-center gap-16 mb-12">
+                  <div class="text-center">
+                    <div class="voice-count" id="up-count">0</div>
+                    <p class="text-brass mt-4">UP</p>
+                  </div>
+                  <div class="text-center">
+                    <div class="voice-count" id="down-count">0</div>
+                    <p class="text-mute" id="down-label">DOWN</p>
+                  </div>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="chorus-bar" style="width: 50%;"></div>
+                </div>
+                <p class="mt-8 text-center text-mute" id="chorus-lean">Crowd leans Up</p>
+              </div>
+            </div>
+          </div>
+          <!-- Fills bottom half with scrolling voice tape -->
+          <div class="flex-1 min-h-0" style="overflow: hidden;">
+            <p class="mono mb-8">RECENT CHIMES</p>
+            <div class="scroll-tape" id="chime-tape">
+              <div class="scroll-row tape-up"><span class="text-brass">↑</span> <span>Sage</span> <span class="ml-auto text-mute">0:02</span></div>
+              <div class="scroll-row tape-up"><span class="text-brass">↑</span> <span>Rogue</span> <span class="ml-auto text-mute">0:01</span></div>
+              <div class="scroll-row"><span class="text-slate">↓</span> <span>Oracle</span> <span class="ml-auto text-mute">0:01</span></div>
+              <div class="scroll-row tape-up"><span class="text-brass">↑</span> <span>Vix</span> <span class="ml-auto text-mute">0:02</span></div>
+              <div class="scroll-row"><span class="text-slate">↓</span> <span>Kai</span> <span class="ml-auto text-mute">0:01</span></div>
+              <div class="scroll-row tape-up"><span class="text-brass">↑</span> <span>Flux</span> <span class="ml-auto text-mute">0:02</span></div>
             </div>
           </div>
         </div>
       </section>
       
-      <!-- CLIP 5: The Bell (55-75s) -->
-      <section id="scene-bell" class="clip" data-start="55" data-duration="20">
-        <div class="flex flex-col items-center justify-center h-full">
-          <div class="card text-center" style="max-width: 800px;">
-            <p class="mono mb-8 text-halt">FINAL 30s</p>
-            <div class="clock" id="clock-final" style="width: 300px; height: 300px; margin: 0 auto;">
-              <div class="clock-hand" id="clock-hand-final" style="height: 120px;"></div>
+      <!-- SCENE 4: Stake Slam (11–14s) -->
+      <section id="scene-stake" class="clip" data-start="11" data-duration="3">
+        <div class="flex flex-col h-full">
+          <div class="flex gap-16 items-center mb-12">
+            <div class="flex-1">
+              <p class="text-ink mb-12">When you're ready, follow or fade with a stake. One tap, instant IOC fill. Your side is locked in.</p>
+              <div class="flex gap-12">
+                <button class="btn" id="follow-btn" style="opacity: 0;">FOLLOW sage ↑</button>
+                <button class="btn btn-outline" id="fade-btn" style="opacity: 0;">FADE ↓</button>
+              </div>
+              <div class="mt-8">
+                <p class="text-mute">Stake tUSDC · One tap fill</p>
+              </div>
             </div>
-            <div class="mt-8">
+            <div class="flex-1">
+              <div class="card">
+                <div class="flex justify-between items-center mb-12">
+                  <span class="badge">PIT</span>
+                  <span class="mono">01 / 02</span>
+                </div>
+                <div class="seat followed">
+                  <div class="seat-avatar">A</div>
+                  <div class="seat-info">
+                    <div class="seat-name">Sage</div>
+                    <div class="seat-side">↑ Up · 58¢</div>
+                  </div>
+                  <span class="badge">FOLLOWED</span>
+                </div>
+                <div class="seat">
+                  <div class="seat-avatar" style="background: var(--slate);">B</div>
+                  <div class="seat-info">
+                    <div class="seat-name">Rogue</div>
+                    <div class="seat-side">↓ Down · 42¢</div>
+                  </div>
+                </div>
+                <div class="mt-8">
+                  <p class="text-mute">Allegiance: <span class="text-brass">Sage</span></p>
+                  <p class="text-mute">Size: <span class="text-brass">5 tUSDC</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Fill confirmation toast -->
+          <div class="flex-1 min-h-0 flex items-center justify-center">
+            <div class="card text-center" style="max-width: 600px; width: 100%;" id="fill-toast" style="opacity: 0; transform: translateY(20px);">
+              <p class="mono mb-8">FILL CONFIRMED</p>
+              <div class="flex items-center justify-center gap-12 mb-8">
+                <span class="text-48 text-brass font-medium">↑58¢</span>
+                <span class="text-mute">·</span>
+                <span class="text-48 text-brass font-medium">5 tUSDC</span>
+              </div>
+              <p class="text-mute">Followed Sage · IOC filled instantly</p>
+              <p class="mono mt-8" style="font-size: 16px;">0xa61a…8de8</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- SCENE 5: Bell Countdown (14–19s) -->
+      <section id="scene-bell" class="clip" data-start="14" data-duration="5">
+        <div class="flex flex-col items-center justify-center h-full">
+          <div class="card text-center" style="max-width: 900px;">
+            <p class="mono mb-12 text-halt">FINAL 30s</p>
+            <div class="clock" id="clock-final" style="width: 360px; height: 360px; margin: 0 auto;">
+              <div class="clock-hand" id="clock-hand-final" style="height: 140px;"></div>
+            </div>
+            <div class="mt-12">
               <span class="large" id="final-price">↑52¢</span>
               <p class="mt-4 text-mute" id="countdown">0:29</p>
             </div>
@@ -460,71 +558,91 @@
         </div>
       </section>
       
-      <!-- CLIP 6: ChimeCard (75-100s) -->
-      <section id="scene-card" class="clip" data-start="75" data-duration="25">
+      <!-- SCENE 6: Result Stamp (19–24s) -->
+      <section id="scene-card" class="clip" data-start="19" data-duration="5">
         <div class="flex flex-col items-center justify-center h-full">
-          <div class="chime-card" style="max-width: 900px;">
-            <p class="mono mb-8">RESULT</p>
-            <div class="flex items-center gap-12 mb-8">
+          <div class="chime-card" style="max-width: 1000px; opacity: 0;">
+            <p class="mono mb-12">RESULT</p>
+            <div class="flex items-center gap-16 mb-12">
               <span class="large" id="result-price">↑67¢</span>
-              <span class="text-halt text-48">BTC closed Up</span>
+              <span class="text-halt" style="font-size: 48px; font-weight: 500;">BTC closed Up</span>
             </div>
             <div class="divider"></div>
-            <div class="flex items-center gap-12 mb-8">
+            <div class="flex items-center gap-16 mb-12">
               <div class="text-center">
-                <div class="voice-count" id="final-voices">47</div>
+                <div class="voice-count" id="final-voices">0</div>
                 <p class="text-mute">voices chimed in</p>
               </div>
               <div class="text-center">
-                <div class="voice-count" id="user-result" style="color: var(--brass);">✓</div>
+                <div class="voice-count" id="user-result" style="color: var(--brass); opacity: 0;">✓</div>
                 <p class="text-mute">you won</p>
               </div>
             </div>
-            <div class="flex gap-8 justify-center mt-8">
+            <div class="flex gap-12 justify-center mt-12">
               <button class="btn">↗ POST ON X</button>
               <button class="btn btn-outline">VIEW ON DESK</button>
             </div>
-            <p class="mt-8 text-mute text-18">?chime=67 deep-link back to next window</p>
+            <p class="mt-12 text-mute" style="font-size: 20px;">?chime=67 deep-link back to next window</p>
           </div>
         </div>
       </section>
       
-      <!-- CLIP 7: Roster Share (100-120s) -->
-      <section id="scene-roster" class="clip" data-start="100" data-duration="20">
-        <div class="flex gap-12 items-center">
-          <div class="flex-1">
-            <p class="text-ink mb-8">Share your agent's performance. The ?ride= deep-link drops friends directly into their seat.</p>
-            <div class="seat" style="border: 2px solid var(--brass);">
-              <div class="seat-avatar">A</div>
-              <div class="seat-info">
-                <div class="seat-name">Sage</div>
-                <div class="seat-side">72% win rate · 14 wins / 5 losses</div>
+      <!-- SCENE 7: Share Roll (24–28s) -->
+      <section id="scene-roster" class="clip" data-start="24" data-duration="4">
+        <div class="flex flex-col h-full">
+          <div class="flex gap-16 items-center mb-12">
+            <div class="flex-1">
+              <p class="text-ink mb-12">Share your agent's performance. The ?ride= deep-link drops friends directly into their seat.</p>
+              <div class="seat followed">
+                <div class="seat-avatar">A</div>
+                <div class="seat-info">
+                  <div class="seat-name">Sage</div>
+                  <div class="seat-side" id="win-rate" style="opacity: 0;">72% win rate · 14 wins / 5 losses</div>
+                </div>
+                <button class="btn btn-outline" style="padding: 16px 32px; font-size: 20px;">↗ SHARE</button>
               </div>
-              <button class="btn btn-outline" style="padding: 12px 24px; font-size: 18px;">↗ SHARE</button>
+              <p class="mt-8 text-mute">Riders land with allegiance pre-selected</p>
             </div>
-            <p class="mt-8 text-mute">Riders land with allegiance pre-selected</p>
-          </div>
-          <div class="flex-1">
-            <div class="card">
-              <div class="flex justify-between items-center mb-8">
-                <span class="badge">ROSTER</span>
-                <span class="mono">leaderboard</span>
+            <div class="flex-1">
+              <div class="card">
+                <div class="flex justify-between items-center mb-12">
+                  <span class="badge">ROSTER</span>
+                  <span class="mono">leaderboard</span>
+                </div>
+                <div class="tape" id="roster-tape">
+                  <div class="tape-row">
+                    <span class="text-brass">01</span>
+                    <span>Sage</span>
+                    <span class="ml-auto text-brass">72%</span>
+                  </div>
+                  <div class="tape-row">
+                    <span class="text-mute">02</span>
+                    <span>Rogue</span>
+                    <span class="ml-auto" style="color: var(--slate);">68%</span>
+                  </div>
+                  <div class="tape-row">
+                    <span class="text-mute">03</span>
+                    <span>Oracle</span>
+                    <span class="ml-auto" style="color: var(--slate);">65%</span>
+                  </div>
+                </div>
               </div>
-              <div class="tape" id="roster-tape">
-                <div class="tape-row">
-                  <span class="text-brass">01</span>
-                  <span>Sage</span>
-                  <span class="ml-auto text-brass">72%</span>
+            </div>
+          </div>
+          <!-- Fills bottom with live follower counter -->
+          <div class="flex-1 min-h-0 flex items-center">
+            <div class="card w-full" style="max-width: 1200px; margin: 0 auto;">
+              <p class="mono mb-8">LIVE RIDERS</p>
+              <div class="flex items-center gap-16">
+                <div class="text-center flex-1">
+                  <div class="voice-count" id="rider-count">0</div>
+                  <p class="text-brass mt-4">ACTIVE RIDERS</p>
                 </div>
-                <div class="tape-row">
-                  <span class="text-mute">02</span>
-                  <span>Rogue</span>
-                  <span class="ml-auto text-slate">68%</span>
-                </div>
-                <div class="tape-row">
-                  <span class="text-mute">03</span>
-                  <span>Oracle</span>
-                  <span class="ml-auto text-slate">65%</span>
+                <div class="flex-1">
+                  <div class="progress-bar" style="height: 16px;">
+                    <div class="progress-fill" id="rider-bar" style="width: 0%;"></div>
+                  </div>
+                  <p class="mt-4 text-mute text-center">Growing as more traders join Sage's streak</p>
                 </div>
               </div>
             </div>
@@ -532,28 +650,25 @@
         </div>
       </section>
       
-      <!-- CLIP 8: Call to Action (120-150s) -->
-      <section class="clip" data-start="120" data-duration="30">
-        <div class="flex flex-col items-center justify-center h-full text-center">
-          <p class="mono mb-8">BUILD WITH DREAMDEX</p>
-          <h1 class="mb-8">Chime</h1>
-          <p class="text-ink mb-12" style="max-width: 800px; font-size: 32px;">
-            Two seats. One window. Chime in.
-          </p>
-          <div class="flex gap-8">
-            <a href="https://github.com/thisyearnofear/chime" target="_blank" class="btn">
-              ↗ GITHUB REPO
-            </a>
-            <a href="https://usechime.netlify.app" target="_blank" class="btn btn-outline">
-              TRY IT LIVE
-            </a>
+      <!-- SCENE 8: CTA Stamp (28–33s) -->
+      <section id="scene-cta" class="clip" data-start="28" data-duration="5">
+        <div class="flex flex-col items-center justify-center h-full text-center" style="padding: 0;">
+          <p class="mono mb-8" id="cta-eye-brow" style="opacity: 0;">BUILD WITH DREAMDEX</p>
+          <h1 id="cta-title" style="opacity: 0; font-size: 120px;">Chime</h1>
+          <div class="mt-8" id="cta-cascade">
+            <span class="cascade-word">Two</span>
+            <span class="cascade-word">seats.</span>
+            <span class="cascade-word">One</span>
+            <span class="cascade-word">window.</span>
+            <span class="cascade-word" style="color: var(--brass);">Chime</span>
+            <span class="cascade-word" style="color: var(--brass);">in.</span>
           </div>
           <div class="divider mt-12"></div>
-          <p class="text-mute">
-            Somnia Testnet · DreamDEX Event Contracts · @somnia-chain/markets-sdk
+          <p class="text-brass font-medium mt-8" id="cta-url" style="opacity: 0; font-size: 40px; letter-spacing: 0.05em;">
+            www.chime.trustfall.xyz
           </p>
-          <p class="text-mute mt-8">
-            SDK feedback: docs/SDK_FEEDBACK.md
+          <p class="text-mute mt-8" id="cta-footer" style="opacity: 0; font-size: 20px;">
+            Somnia Testnet · DreamDEX Event Contracts
           </p>
         </div>
       </section>
@@ -563,58 +678,256 @@
     <script>
       const tl = gsap.timeline({ paused: true });
       
-      // Clip 1: Hook (0-10s)
-      tl.to('#root .clip[data-start="0"] .mono', { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.5)
-        .to('#root .clip[data-start="0"] h1', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 1.5)
-        .to('#root .clip[data-start="0"] h2', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 2.5);
+      // SCENE 1: Hook Stamp (0–3s)
+      tl.to('#eye-brow', { opacity: 1, duration: 0.2, ease: 'none' }, 0.2)
+        .to('#hero-title', { 
+          opacity: 1, 
+          scale: 1, 
+          duration: 0.4, 
+          ease: 'back.out(1.7)',
+          onStart: () => { gsap.set('#hero-title', { transformOrigin: 'center center' }); }
+        }, 0.4)
+        .to('.cascade-word', { 
+          opacity: 1, 
+          y: 0, 
+          stagger: 0.06, 
+          duration: 0.25, 
+          ease: 'back.out(1.5)',
+          onStart: () => { gsap.set('.cascade-word', { y: 20 }); }
+        }, 0.9)
+        .to('#hero-url', { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.3, 
+          ease: 'power2.out',
+          onStart: () => { gsap.set('#hero-url', { y: 10 }); }
+        }, 1.8);
       
-      // Clip 2: Window (10-25s)
-      tl.to('#root .clip[data-start="10"] .card', { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }, 0.2)
-        .to('#root .clip[data-start="10"] p', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 0.8)
-        .to('#root .clip[data-start="10"] .seat', { opacity: 1, x: 0, stagger: 0.2, duration: 0.5, ease: 'power2.out' }, 1.4)
-        .to('#price1', { innerText: 67, duration: 2, snap: { innerText: 1 }, ease: 'none' }, 12);
+      // SCENE 2: Window Snap (3–7s)
+      tl.to('#clock1', { 
+        opacity: 1, 
+        rotationX: 0, 
+        scale: 1,
+        duration: 0.5, 
+        ease: 'back.out(1.7)',
+        onStart: () => { gsap.set('#clock1', { transformOrigin: 'center center' }); }
+      }, 3)
+        .to('#price1', { 
+          innerText: 67, 
+          duration: 0.8, 
+          snap: { innerText: 1 }, 
+          ease: 'power2.out'
+        }, 3.3)
+        .to('#seat-sage', { 
+          opacity: 1, 
+          rotationY: 0, 
+          duration: 0.4, 
+          ease: 'back.out(1.5)',
+          onStart: () => { gsap.set('#seat-sage', { rotationY: 90 }); }
+        }, 3.6)
+        .to('#seat-rogue', { 
+          opacity: 1, 
+          rotationY: 0, 
+          duration: 0.4, 
+          ease: 'back.out(1.5)',
+          onStart: () => { gsap.set('#seat-rogue', { rotationY: 90 }); }
+        }, 3.75);
       
-      // Clip 3: Chime Free (25-40s)
-      tl.to('#root .clip[data-start="25"] p', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 0.2)
-        .to('#root .clip[data-start="25"] .btn', { opacity: 1, y: 0, stagger: 0.1, duration: 0.4, ease: 'power2.out' }, 0.8)
-        .to('#root .clip[data-start="25"] .card', { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }, 1.4)
-        .to('#up-count', { innerText: 12, duration: 1.5, snap: { innerText: 1 }, ease: 'power2.out' }, 16)
-        .to('#down-count', { innerText: 8, duration: 1.5, snap: { innerText: 1 }, ease: 'power2.out' }, 17)
-        .to('#chorus-bar', { width: '60%', duration: 1, ease: 'power2.out' }, 18);
+      // SCENE 3: Chime Pop (7–11s)
+      tl.to('#chime-up', { 
+        opacity: 1, 
+        scale: 1, 
+        duration: 0.3, 
+        ease: 'back.out(2)',
+        onStart: () => { gsap.set('#chime-up', { scale: 0 }); }
+      }, 7)
+        .to('#chime-down', { 
+          opacity: 1, 
+          scale: 1, 
+          duration: 0.3, 
+          ease: 'back.out(2)',
+          onStart: () => { gsap.set('#chime-down', { scale: 0 }); }
+        }, 7.15)
+        .to('#up-count', { 
+          innerText: 12, 
+          duration: 0.6, 
+          snap: { innerText: 1 }, 
+          ease: 'power2.out'
+        }, 7.4)
+        .to('#down-count', { 
+          innerText: 8, 
+          duration: 0.6, 
+          snap: { innerText: 1 }, 
+          ease: 'power2.out'
+        }, 7.5)
+        .to('#chorus-bar', { 
+          width: '60%', 
+          duration: 0.4, 
+          ease: 'power2.inOut'
+        }, 8.2)
+        // Pulse ring animation
+        .to('#pulse-1', { 
+          opacity: 0.4, 
+          scale: 1, 
+          duration: 0.8, 
+          ease: 'power2.out',
+          onStart: () => { gsap.set('#pulse-1', { scale: 0.5, opacity: 0 }); }
+        }, 8)
+        // Scroll tape rows in
+        .to('#chime-tape .scroll-row', { 
+          opacity: 1, 
+          y: 0, 
+          stagger: 0.08, 
+          duration: 0.25, 
+          ease: 'back.out(1.5)',
+          onStart: () => { gsap.set('#chime-tape .scroll-row', { y: 20 }); }
+        }, 8.5);
       
-      // Clip 4: Follow/Fade (40-55s)
-      tl.to('#root .clip[data-start="40"] p', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 0.2)
-        .to('#root .clip[data-start="40"] .btn', { opacity: 1, y: 0, stagger: 0.1, duration: 0.4, ease: 'power2.out' }, 0.8)
-        .to('#root .clip[data-start="40"] .card', { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }, 1.4);
+      // SCENE 4: Stake Slam (11–14s)
+      tl.to('#follow-btn', { 
+        opacity: 1, 
+        scale: 1, 
+        duration: 0.3, 
+        ease: 'back.out(2)',
+        onStart: () => { gsap.set('#follow-btn', { scale: 0 }); }
+      }, 11)
+        .to('#fade-btn', { 
+          opacity: 1, 
+          scale: 1, 
+          duration: 0.3, 
+          ease: 'back.out(2)',
+          onStart: () => { gsap.set('#fade-btn', { scale: 0 }); }
+        }, 11.15)
+        .to('#seat-sage', { 
+          borderColor: 'var(--brass)',
+          boxShadow: '0 0 40px rgba(196, 161, 90, 0.3)',
+          duration: 0.3,
+          ease: 'power2.out'
+        }, 11.3)
+        // Fill confirmation toast
+        .to('#fill-toast', { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.4, 
+          ease: 'back.out(1.7)',
+          onStart: () => { gsap.set('#fill-toast', { y: 30 }); }
+        }, 12);
       
-      // Clip 5: The Bell (55-75s)
-      tl.to('#root .clip[data-start="55"] .card', { opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out' }, 0.2)
-        .to('#final-price', { innerText: 67, duration: 2, snap: { innerText: 1 }, ease: 'none' }, 60)
-        .to('#countdown', { innerText: '0:00', duration: 30, ease: 'power2.in' }, 65)
-        .set('#final-price', { color: '#c45c4a' }, 85);
+      // SCENE 5: Bell Countdown (14–19s)
+      tl.to('#final-price', { 
+        innerText: 67, 
+        duration: 0.8, 
+        snap: { innerText: 1 }, 
+        ease: 'power2.out'
+      }, 14)
+        .to('#countdown', { 
+          innerText: '0:00', 
+          duration: 3, 
+          ease: 'power1.in'
+        }, 15)
+        .set('#final-price', { color: '#c45c4a' }, 18);
       
-      // Clip 6: ChimeCard (75-100s)
-      tl.to('#root .clip[data-start="75"] .chime-card', { opacity: 1, scale: 1, duration: 0.8, ease: 'power2.out' }, 0.2)
-        .to('#result-price', { innerText: 67, duration: 1, snap: { innerText: 1 }, ease: 'power2.out' }, 1)
-        .to('#final-voices', { innerText: 47, duration: 1.5, snap: { innerText: 1 }, ease: 'power2.out' }, 3)
-        .to('#user-result', { opacity: 1, scale: 1.2, duration: 0.4, ease: 'back.out(1.7)' }, 5)
-        .to('#root .clip[data-start="75"] .btn', { opacity: 1, y: 0, stagger: 0.1, duration: 0.4, ease: 'power2.out' }, 6);
+      // SCENE 6: Result Stamp (19–24s)
+      tl.to('#scene-card .chime-card', { 
+        opacity: 1, 
+        scale: 1, 
+        duration: 0.5, 
+        ease: 'back.out(1.7)',
+        onStart: () => { gsap.set('#scene-card .chime-card', { scale: 0.8 }); }
+      }, 19)
+        .to('#result-price', { 
+          innerText: 67, 
+          duration: 0.6, 
+          snap: { innerText: 1 }, 
+          ease: 'power2.out'
+        }, 19.2)
+        .to('#final-voices', { 
+          innerText: 47, 
+          duration: 0.8, 
+          snap: { innerText: 1 }, 
+          ease: 'power2.out'
+        }, 19.8)
+        .to('#user-result', { 
+          opacity: 1, 
+          scale: 1.2, 
+          duration: 0.3, 
+          ease: 'back.out(1.7)',
+          onStart: () => { gsap.set('#user-result', { scale: 0 }); }
+        }, 21)
+        .to('#scene-card .btn', { 
+          opacity: 1, 
+          y: 0, 
+          stagger: 0.1, 
+          duration: 0.3, 
+          ease: 'back.out(1.5)',
+          onStart: () => { gsap.set('#scene-card .btn', { y: 20 }); }
+        }, 21.5);
       
-      // Clip 7: Roster Share (100-120s)
-      tl.to('#root .clip[data-start="100"] p', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 0.2)
-        .to('#root .clip[data-start="100"] .seat', { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }, 0.8)
-        .to('#root .clip[data-start="100"] .card', { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }, 1.4)
-        .to('#root .clip[data-start="100"] .tape-row', { opacity: 1, x: 0, stagger: 0.15, duration: 0.4, ease: 'power2.out' }, 2);
+      // SCENE 7: Share Roll (24–28s)
+      tl.to('#win-rate', { 
+        opacity: 1, 
+        duration: 0.3, 
+        ease: 'power2.out'
+      }, 24)
+        .to('#roster-tape .tape-row', { 
+          opacity: 1, 
+          x: 0, 
+          stagger: 0.12, 
+          duration: 0.35, 
+          ease: 'back.out(1.5)',
+          onStart: () => { gsap.set('#roster-tape .tape-row', { x: -30 }); }
+        }, 24.3)
+        // Rider count climbs
+        .to('#rider-count', { 
+          innerText: 147, 
+          duration: 1.2, 
+          snap: { innerText: 1 }, 
+          ease: 'power2.out'
+        }, 25)
+        .to('#rider-bar', { 
+          width: '78%', 
+          duration: 1, 
+          ease: 'power2.inOut'
+        }, 25.2);
       
-      // Clip 8: CTA (120-150s)
-      tl.to('#root .clip[data-start="120"] .mono', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 0.5)
-        .to('#root .clip[data-start="120"] h1', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 1.2)
-        .to('#root .clip[data-start="120"] p', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 2.2)
-        .to('#root .clip[data-start="120"] .btn', { opacity: 1, y: 0, stagger: 0.1, duration: 0.4, ease: 'power2.out' }, 3.2)
-        .to('#root .clip[data-start="120"] .divider', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 4.2)
-        .to('#root .clip[data-start="120"] .text-mute', { opacity: 1, duration: 0.6, ease: 'power2.out' }, 5);
+      // SCENE 8: CTA Stamp (28–33s)
+      tl.to('#cta-eye-brow', { 
+        opacity: 1, 
+        duration: 0.2, 
+        ease: 'none'
+      }, 28)
+        .to('#cta-title', { 
+          opacity: 1, 
+          scale: 1, 
+          duration: 0.5, 
+          ease: 'back.out(1.7)',
+          onStart: () => { gsap.set('#cta-title', { scale: 0 }); }
+        }, 28.2)
+        .to('#cta-cascade .cascade-word', { 
+          opacity: 1, 
+          y: 0, 
+          stagger: 0.06, 
+          duration: 0.25, 
+          ease: 'back.out(1.5)',
+          onStart: () => { gsap.set('#cta-cascade .cascade-word', { y: 20 }); }
+        }, 28.8)
+        .to('#cta-url', { 
+          opacity: 1, 
+          y: 0, 
+          duration: 0.4, 
+          ease: 'back.out(1.5)',
+          onStart: () => { gsap.set('#cta-url', { y: 15 }); }
+        }, 30.3)
+        .to('#cta-footer', { 
+          opacity: 1, 
+          duration: 0.3, 
+          ease: 'power2.out'
+        }, 30.6);
       
-      window.__timelines['main'] = tl;
+      // Ambient idle for holds - removed infinite repeat
+      // tl.to('#root', { scale: 1.01, duration: 2, ease: 'sine.inOut', yoyo: true, repeat: -1 }, 30);
+      
+      window.__timelines['fondof-demo'] = tl;
     </script>
   </body>
 </html>
