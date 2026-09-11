@@ -2,6 +2,15 @@
 
 Working log of shipped changes. Dates in YYYY-MM-DD.
 
+## 2026-09-11 — Progressive disclosure on Floor + audio rewrite
+
+- **Progressive disclosure** (`Floor.tsx`) — Floor WINDOW now renders compact by default: clock + price/time line only. Hero text, ritual dots, voices CTA, DebateTicker, WindowStory, ImpliedSpark, ProbabilityRail, and TensionShare are hidden until user clicks "Dive in →". First interaction is tracked via `useRef`; subsequent interactions keep the expanded state. Reduces cognitive load for new visitors while preserving full context for engaged users.
+- **Audio rewrite** — VO regenerated with trimmed script (~30 words) and `atempo=1.3` time-stretch to fit 33s composition. BGM generated via ElevenLabs Music API (`music_v2`, `force_instrumental: true`, `music_length_ms: 33000`). Silent placeholder removed. Files: `public/audio/`, `hyperframes/project/audio/`.
+- **`.gitignore`** — Added rules to exclude `public/audio/`, `hyperframes/project/audio/`, and all `*.mp3/*.mp4/*.mov/*.wav/*.aac` from version control. Generated assets are not source.
+- **`README.md`** — Added demo video link, backend VPS URL.
+
+Validation: `npm run lint` clean, `npx tsc --noEmit` exit 0, `next build` 13/13.
+
 ## 2026-09-11 — Review fixes: sticky, dots, countdown, deep-links, ledger
 
 Follow-up to the UX clarity pass — every P0 from the review:
