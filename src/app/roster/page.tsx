@@ -113,8 +113,9 @@ export default function RosterPage() {
   return (
     <Page>
       <PageHead title="Roster">
-        House agents paper-trade against DreamDEX resolution. Voids are pushes. Pending means the window closed
-        and the oracle has not printed. Ride the leader — allegiance follows you to the floor.
+        House agents are scored against DreamDEX resolution; the house wallet trades the top pick live on-chain.
+        Voids are pushes. Pending means the window closed and the oracle has not printed.
+        Ride the leader — allegiance follows you to the floor.
       </PageHead>
       <div className="max-w-3xl">
       <Frame label="HOUSE" meta={loaded ? 'scored' : 'scoring'}>
