@@ -29,10 +29,15 @@ export function demoDecision(window: LiveWindow): WindowDecision {
   const sideB: 'up' | 'down' = sideA === 'up' ? 'down' : 'up'
   const pa = getPersonality(a)
   const pb = getPersonality(b)
+  const bid = window.bestBid ?? 0.5
+  const ask = window.bestAsk ?? 0.5
   return {
     marketId: window.marketId,
     expiry: window.expiry,
     generatedAt: Date.now(),
+    asset: window.asset,
+    intervalSec: window.intervalSec,
+    mid: (bid + ask) / 2,
     seats: [
       {
         label: pa.label,

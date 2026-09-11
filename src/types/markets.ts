@@ -38,6 +38,8 @@ export interface WindowDecision {
   generatedAt: number
   asset?: Asset
   intervalSec?: IntervalSec
+  /** Implied-Up mid (0–1) at decision time — powers favoured/against splits on Roster. */
+  mid?: number | null
 }
 
 export interface TimelineEvent {
@@ -92,6 +94,14 @@ export interface RosterRow {
   losses: number
   pushes: number
   pending: number
+  /** Decided windows where the seat rode the implied favourite at take time. */
+  favouredWins: number
+  favouredLosses: number
+  /** Decided windows where the seat faded the implied favourite at take time. */
+  againstWins: number
+  againstLosses: number
+  /** Distinct cadences (e.g. "15m", "1h") this agent has a scored window on. */
+  cadences: string[]
 }
 
 export interface ResolvedMarket {

@@ -9,6 +9,8 @@
     "lint": "eslint src/",
     "prove:loop": "node scripts/prove-loop.mjs",
     "prove:seat": "node scripts/prove-loop.mjs --seat",
+    "house": "node scripts/house-agent.mjs --once",
+    "house:loop": "node scripts/house-agent.mjs --loop",
     "prepare": "husky"
   },
   "dependencies": {

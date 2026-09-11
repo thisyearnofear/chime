@@ -47,7 +47,18 @@ function ShareRide({ label, pct }: { label: string; pct: number }) {
 
 export default function RosterPage() {
   const [rows, setRows] = useState<RosterRow[]>(() =>
-    PERSONALITY_PRESETS.map((p) => ({ label: p.label, wins: 0, losses: 0, pushes: 0, pending: 0 }))
+    PERSONALITY_PRESETS.map((p) => ({
+      label: p.label,
+      wins: 0,
+      losses: 0,
+      pushes: 0,
+      pending: 0,
+      favouredWins: 0,
+      favouredLosses: 0,
+      againstWins: 0,
+      againstLosses: 0,
+      cadences: [],
+    }))
   )
   const [loaded, setLoaded] = useState(false)
   const [riding, setRiding] = useState<string | null>(null)
@@ -77,7 +88,18 @@ export default function RosterPage() {
       PERSONALITY_PRESETS.map((p, index) => ({
         preset: p,
         index,
-        row: rows.find((r) => r.label === p.label) ?? { label: p.label, wins: 0, losses: 0, pushes: 0, pending: 0 },
+        row: rows.find((r) => r.label === p.label) ?? {
+          label: p.label,
+          wins: 0,
+          losses: 0,
+          pushes: 0,
+          pending: 0,
+          favouredWins: 0,
+          favouredLosses: 0,
+          againstWins: 0,
+          againstLosses: 0,
+          cadences: [],
+        },
       })).sort((a, b) => winRate(b.row) - winRate(a.row) || b.row.wins - a.row.wins),
     [rows]
   )
@@ -100,6 +122,11 @@ export default function RosterPage() {
         {ranked.map(({ preset: p, row }) => {
           const rate = winRate(row)
           const pct = Math.round(rate * 100)
+          const decided = row.wins + row.losses
+          const favDecided = (row.favouredWins ?? 0) + (row.favouredLosses ?? 0)
+          const agDecided = (row.againstWins ?? 0) + (row.againstLosses ?? 0)
+          const favPct = favDecided ? Math.round(((row.favouredWins ?? 0) / favDecided) * 100) : null
+          const agPct = agDecided ? Math.round(((row.againstWins ?? 0) / agDecided) * 100) : null
           const ridingThis = allegiance === p.label
           return (
             <li key={p.label} className="py-4 border-t border-[var(--line)] first:border-t-0">
@@ -136,6 +163,20 @@ export default function RosterPage() {
                   )}
                 </span>
               </div>
+              <p className="mt-2 text-[11px] text-[var(--mute)]">
+                {favPct !== null || agPct !== null ? (
+                  <>
+                    {favPct !== null ? `favoured ${favPct}% (${row.favouredWins ?? 0}/${favDecided})` : 'favoured —'}
+                    {' · '}
+                    {agPct !== null ? `against ${agPct}% (${row.againstWins ?? 0}/${agDecided})` : 'against —'}
+                    {(row.cadences?.length ?? 0) > 0 ? ` · ${row.cadences.join(' / ')}` : ''}
+                  </>
+                ) : decided > 0 ? (
+                  <>scored before take-time splits — new windows split favoured / against</>
+                ) : (
+                  <>no scored windows yet — splits appear once the oracle prints</>
+                )}
+              </p>
             </li>
           )
         })}

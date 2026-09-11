@@ -2,6 +2,52 @@
 
 Working log of shipped changes. Dates in YYYY-MM-DD.
 
+## 2026-09-11 — ec-chime house bot deployed to VPS
+
+- **ec-chime live in production** — the bot-kit strategy
+  (`dreamdex-bot-kit/strategies/ec-chime`) is now running 24/7 on `snel-bot`
+  under PM2 (`/opt/ec-chime`). First production fill:
+  `BTC-0-11SEP26-1745/tUSDC` 2 shares @ 0.478, tx
+  `0x3f8f3aec547e0c010d0f7bf3807ec584d7870aaf3cc408edff8aef75971d74ee`.
+- **House wallet funded** — `0x82BA4AAdF619eC82AcE7c7C77021Ec09F1f6AB5A`
+  holds 5.5 STT (gas) + 100 tUSDC (collateral). Key stored in
+  `/opt/ec-chime/shared/.env` (chmod 600, never committed).
+- **Deploy tooling** — `scripts/deploy-ec-chime.sh` in the bot-kit repo:
+  typecheck → rsync → npm install on VPS → PM2 restart.
+- **Docs updated** — `docs/HOUSE_AGENT.md` now covers both the standalone
+  script and the bot-kit production deployment.
+
+## 2026-09-11 — Winning claim proven + Roster strategy splits + house agent loop
+
+P5-21 (one winning claim on camera) is now proven on Shannon:
+
+- **Winning redemption** — `prove:loop` run 2026-09-11 redeemed 1 position on-chain:
+  tx `0x6e3190ec124f4e2c3d14eb431c9cd8d6f45eaa515dafd93161ce34211f07e185`
+  (shannon-explorer.somnia.network). Earlier run followed live book
+  `ETH-0-11SEP26-1610/tUSDC#YES 5 @ 0.806` (tx `0xac7eea…`) with chain seat
+  YES 10000000 / NO 0. `claimScan` swept 5 markets, paid 1. The losing-ticket
+  zero-claim path from 2026-09-10 still holds; the winning path is now proven too.
+
+- **Roster v2 splits** (`types/markets.ts`, `decide.ts`, `api/agents/roster`,
+  `roster/page.tsx`, `demo-data.ts`) — `WindowDecision` stores take-time `mid`
+  (`impliedUp(bestBid,bestAsk)`). Roster splits each scored seat into
+  `favoured W/L` (rode the implied favourite) vs `against W/L` (faded it) plus
+  scored `cadences` (15m/1h/4h/24h). Legacy decisions without a mid stay out of
+  the split. Row renders `favoured N% (w/n) · against N% (w/n) · 15m / 1h`.
+  Backwards-compatible: new fields default to 0/[] on old rows and old API
+  payloads. Verified: `tsc` 0, `lint` clean, POST `/api/agents/window` returns
+  `"mid":0.62`, GET `/api/agents/roster` returns split fields on all 6 rows.
+
+- **House agent loop** (`scripts/house-agent.mjs`) — one autonomous process, no
+  new deps, no Bot Kit: each poll reads `/api/markets/live`, picks the
+  soonest-closing Trading window, reads the cached seat decision, takes the
+  deterministic seat's side on the live book via IOC (same `touch+0.02`
+  pricing as `placeFollowOrder`), and runs `claimScan` for the house wallet.
+  `HOUSE_PRIVATE_KEY` (or `DEPLOYER_PRIVATE_KEY`) from `.env.local`, `--once`
+  for a single pass, `--loop` for a daemon. Runbook in `docs/HOUSE_AGENT.md`.
+
+Validation: `npm run lint` clean, `npx tsc --noEmit` exit 0.
+
 ## 2026-09-11 — Progressive disclosure on Floor + audio rewrite
 
 - **Progressive disclosure** (`Floor.tsx`) — Floor WINDOW now renders compact by default: clock + price/time line only. Hero text, ritual dots, voices CTA, DebateTicker, WindowStory, ImpliedSpark, ProbabilityRail, and TensionShare are hidden until user clicks "Dive in →". First interaction is tracked via `useRef`; subsequent interactions keep the expanded state. Reduces cognitive load for new visitors while preserving full context for engaged users.

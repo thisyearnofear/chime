@@ -1,6 +1,7 @@
 import { getPersonality } from '@/lib/personality-presets'
 import { heuristicSide, seatsForWindow } from '@/lib/agents/mapping'
 import { windowTake } from '@/lib/llm/prompts'
+import { impliedUp } from '@/lib/markets/format'
 import type { AgentSeat, Asset, IntervalSec, Side, WindowDecision } from '@/types/markets'
 
 export interface DecideInput {
@@ -116,6 +117,7 @@ export async function decideWindow(input: DecideInput): Promise<WindowDecision> 
     marketId: input.marketId,
     expiry: input.expiry,
     generatedAt: Date.now(),
+    mid: impliedUp(input.bestBid, input.bestAsk),
     seats: [
       seat(labelA, sideA, llmA?.line || heuristicLine(labelA, sideA), llmA?.confidence ?? 0.55, false),
       seat(
