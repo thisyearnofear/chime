@@ -129,6 +129,16 @@ This plan closes the UX / ecosystem / demo gaps without breaking `design.md`.
   with chime-data volume, .dockerignore, deployment runbook). Unvalidated —
   no Docker on this machine; build on the VPS before pointing notes at it.
   Demo-clip re-verified live (2 Up · 1 Down round-trips).
-- Remaining: demo video (script locked, clip verified — film it), winning
-  claim on camera (`npm run prove:loop`, key present in .env.local),
-  Bot Kit agent (credentials pending), final verify, submit.
+- 2026-09-11: UX clarity + review fixes shipped (price line, ladder order,
+  gated Follow/Fade, sticky bar, summary ledger, ritual dots, streak rank;
+  then sticky/countdown/deep-link/scroll/ledger/glossary fixes).
+- 2026-09-11: VPS port switched to 9127 (exotic, free), rsync+PM2 deploy
+  pattern adopted (matches claflin/databard), Docker artifacts dropped.
+- 2026-09-11: Domain split — frontend `chime.trustfall.xyz` → Netlify,
+  backend `api.chime.trustfall.xyz` → VPS. CORS headers added. DNS
+  configured (api.chime resolving, chime CNAME pending Netlify verification).
+- 2026-09-11: Onboarding hint + clearer hero text + free chime labels shipped.
+- 2026-09-11: Demo video composition created (HyperFrames, 150s, 8 scenes).
+  `prove:loop` executed — claim redeemed on-chain (tx `0xd9bc...`).
+- Remaining: Bot Kit agent (credentials pending), render demo video,
+  final submission to hackathon.
