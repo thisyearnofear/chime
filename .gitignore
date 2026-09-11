@@ -59,3 +59,12 @@ credentials.json
 # Temp
 tmp_*
 *.tmp
+
+# Audio / video assets (generated, not source)
+public/audio/
+hyperframes/project/audio/
+**/*.mp3
+**/*.mp4
+**/*.mov
+**/*.wav
+**/*.aac

@@ -65,6 +65,16 @@ export function Floor() {
   const voices = useVoices()
   useExchange()
 
+  // Progressive disclosure: start compact (clock + price only), expand on first interaction
+  const [expanded, setExpanded] = useState(false)
+  const hasInteracted = useRef(false)
+  const handleExpand = useCallback(() => {
+    if (!hasInteracted.current) {
+      hasInteracted.current = true
+      setExpanded(true)
+    }
+  }, [])
+
   // ChimeCard state — shown after the closing bell fires
   const [chimeState, setChimeState] = useState<ChimeState | null>(null)
   const [cardVisible, setCardVisible] = useState(false)
@@ -230,48 +240,71 @@ export function Floor() {
               )}
             </p>
 
-            <p className="mt-3 text-[15px] text-[var(--ink)]">
-              Two AI agents take opposite sides on a BTC or ETH window.
-              Tap to chime free — then follow or fade with a stake.
-            </p>
-            <RitualDots chimed={hasChimed} staked={hasStaked} claimed={hasClaimed} />
-
-            {/* Voices — zero-state recruits, count reports, 3+ is a CTA */}
-            {voices === 0 ? (
-              <button
-                type="button"
-                onClick={scrollToFollowFade}
-                className="chime-rise mt-3 text-[11px] text-left text-[var(--mute)] hover:text-[var(--brass)] transition-colors"
-              >
-                Be the first voice — <span className="underline underline-offset-2">chime in free (no wallet)</span>
-              </button>
-            ) : voices >= 3 ? (
-              <button
-                type="button"
-                onClick={scrollToFollowFade}
-                className="mt-3 text-[11px] text-left hover:text-[var(--brass)] transition-colors"
-              >
-                <span className="text-[var(--brass)]">{voices}</span>
-                {' traders chimed in — '}
-                <span className="underline underline-offset-2">join them (free)</span>
-              </button>
-            ) : (
-              <p className="mt-3 text-[11px] text-[var(--mute)]">
-                <span className="text-[var(--brass)]">{voices}</span>
-                {voices === 1 ? ' voice' : ' voices'} chimed in{' '}
-                <span className="text-[var(--mute)]/70">(free, no wallet)</span>
+            {/* Hero text — hidden in compact mode */}
+            {expanded && (
+              <p className="mt-3 text-[15px] text-[var(--ink)]">
+                Two AI agents take opposite sides on a BTC or ETH window.
+                Tap to chime free — then follow or fade with a stake.
               </p>
             )}
 
-            <div className="mt-6 pt-5 border-t border-[var(--line)]">
-              <DebateTicker seats={decision?.seats} />
-              <WindowStory mids={mids} />
-              <ImpliedSpark mids={mids} window={window} />
-              <ProbabilityRail window={window} />
-            </div>
+            {/* Ritual dots — hidden in compact mode */}
+            {expanded && <RitualDots chimed={hasChimed} staked={hasStaked} claimed={hasClaimed} />}
+
+            {/* Voices CTA */}
+            {expanded && (
+              <>
+                {voices === 0 ? (
+                  <button
+                    type="button"
+                    onClick={scrollToFollowFade}
+                    className="chime-rise mt-3 text-[11px] text-left text-[var(--mute)] hover:text-[var(--brass)] transition-colors"
+                  >
+                    Be the first voice — <span className="underline underline-offset-2">chime in free (no wallet)</span>
+                  </button>
+                ) : voices >= 3 ? (
+                  <button
+                    type="button"
+                    onClick={scrollToFollowFade}
+                    className="mt-3 text-[11px] text-left hover:text-[var(--brass)] transition-colors"
+                  >
+                    <span className="text-[var(--brass)]">{voices}</span>
+                    {' traders chimed in — '}
+                    <span className="underline underline-offset-2">join them (free)</span>
+                  </button>
+                ) : (
+                  <p className="mt-3 text-[11px] text-[var(--mute)]">
+                    <span className="text-[var(--brass)]">{voices}</span>
+                    {voices === 1 ? ' voice' : ' voices'} chimed in{' '}
+                    <span className="text-[var(--mute)]/70">(free, no wallet)</span>
+                  </p>
+                )}
+              </>
+            )}
+
+            {/* Compact mode: show expand button */}
+            {!expanded && (
+              <button
+                type="button"
+                onClick={handleExpand}
+                className="mt-4 text-[11px] text-[var(--mute)] hover:text-[var(--brass)] transition-colors text-left"
+              >
+                Dive in →
+              </button>
+            )}
+
+            {/* Expanded context sections */}
+            {expanded && (
+              <div className="mt-6 pt-5 border-t border-[var(--line)]">
+                <DebateTicker seats={decision?.seats} />
+                <WindowStory mids={mids} />
+                <ImpliedSpark mids={mids} window={window} />
+                <ProbabilityRail window={window} />
+              </div>
+            )}
 
             {/* TensionShare — after the book context, before the stake control */}
-            {showTension && (
+            {expanded && showTension && (
               <TensionShare window={window} upPct={upPct} secondsLeft={left} />
             )}
 

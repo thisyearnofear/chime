@@ -6,6 +6,7 @@ A consumer floor for [DreamDEX Event Contracts](https://docs.dreamdex.io/develop
 
 - Repo: [thisyearnofear/chime](https://github.com/thisyearnofear/chime)
 - Production: [usechime.netlify.app](https://usechime.netlify.app)
+- Demo video: [YouTube](https://youtu.be/csp3rL5X9b8)
 
 Visual lock: [`design.md`](design.md). Agent lock: [`.cursor/skills/chime-floor/SKILL.md`](.cursor/skills/chime-floor/SKILL.md). DreamDEX is the venue. No custom CLOB. No punctuality/GPS.
 
