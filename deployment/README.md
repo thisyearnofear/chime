@@ -84,10 +84,18 @@ From your GoDaddy DNS panel for `trustfall.xyz`:
 
 | Type | Name | Value | TTL |
 |---|---|---|---|
-| A | `chime` | `157.180.36.156` | Auto |
+| CNAME | `chime` | `usechime.netlify.app` | Auto |
 | A | `api.chime` | `157.180.36.156` | Auto |
 
-Note the nested subdomain: `api.chime` creates `api.chime.trustfall.xyz`.
+Note: `api.chime` creates the nested subdomain `api.chime.trustfall.xyz`.
+The CNAME for `chime` points to the Netlify frontend; the A record for
+`api.chime` points to the VPS backend.
+
+Verify propagation:
+```bash
+dig +short chime.trustfall.xyz         # → usechime.netlify.app (or CNAME chain)
+dig +short api.chime.trustfall.xyz     # → 157.180.36.156
+```
 
 ### Nginx site block
 
